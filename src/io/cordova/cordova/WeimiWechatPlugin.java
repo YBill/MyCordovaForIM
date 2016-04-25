@@ -1,13 +1,12 @@
 package io.cordova.cordova;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -17,6 +16,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,74 +38,36 @@ public class WeimiWechatPlugin extends CordovaPlugin {
 	private Activity activity;
 	private CordovaWebView webView;
 	private static WeimiMsgHandler weimiMsgHandler;
-	private static MyInnerReceiver receiver;
-	class MyInnerReceiver extends BroadcastReceiver{
+	private YouyunHandler handler;
+
+	 class YouyunHandler extends Handler{
+
+		private WeakReference<WeimiWechatPlugin> weakReference;
+		public YouyunHandler(WeimiWechatPlugin plugin){
+			weakReference = new WeakReference<WeimiWechatPlugin>(plugin);
+		}
 
 		@Override
-		public void onReceive(Context context, Intent intent) {
-			String action = intent.getAction();
-			if (action.equals("receivetext")) {
-				String fromuid = intent.getStringExtra("fromuid");
-				String content = intent.getStringExtra("content");
-				long time = intent.getLongExtra("time", 0);
-				JSONObject object = new JSONObject();
-				try {
-					object.put("msgType", "receiveText");
-					object.put("fromuid", fromuid);
-					object.put("content", content);
-					object.put("time", time);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-				WeimiUtil.log("receivetext：" + object.toString());
-				webView.loadUrl("javascript:receiveMessageThread('"+object.toString()+"')");
-			}else if(action.equals("receivepicture")){
-				String fromuid = intent.getStringExtra("fromuid");
-				long time = intent.getLongExtra("time", 0);
-				String fileId = intent.getStringExtra("fileId");
-				int fileLength = intent.getIntExtra("fileLength", 0);
-				int pieceSize = intent.getIntExtra("pieceSize", 0);
-				String thumbData = intent.getStringExtra("thumbData");
-				JSONObject object = new JSONObject();
-				try {
-					object.put("msgType", "receiveImage");
-					object.put("fromuid",fromuid);
-					object.put("time",time);
-					object.put("fileId",fileId);
-					object.put("fileLength",fileLength);
-					object.put("pieceSize",pieceSize);
-					object.put("thumbData", thumbData);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-				WeimiUtil.log("receivepicture：" + object.toString());
-				webView.loadUrl("javascript:receiveMessageThread('"+object.toString()+"')");
-			}else if(action.equals("uploadpicpro")){
-				String fileId = intent.getStringExtra("fileID");
-				int progress = intent.getIntExtra("progress", 0);
-				JSONObject object = new JSONObject();
-				try {
-					object.put("msgType", "uploadProgress");
-					object.put("fileID", fileId);
-					object.put("progress", progress);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-				WeimiUtil.log("upload:" + object.toString());
-				webView.loadUrl("javascript:receiveMessageThread('" + object.toString() + "')");
-			}else if(action.equals("downloadpicpro")){
-				String fileId = intent.getStringExtra("fileID");
-				int progress = intent.getIntExtra("progress", 0);
-				JSONObject object = new JSONObject();
-				try {
-					object.put("msgType", "downloadProgress");
-					object.put("fileID", fileId);
-					object.put("progress", progress);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-				WeimiUtil.log("download:" + object.toString());
-				webView.loadUrl("javascript:receiveMessageThread('" + object.toString() + "')");
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			if(weakReference.get() == null){
+				return;
+			}
+			int what = msg.what;
+			WeimiUtil.log("handler what:" + what);
+			switch (what){
+				case WeimiUtil.RECEIVE_TEXT:
+					receiveText(msg);
+					break;
+				case WeimiUtil.RECEIVE_PICTURE:
+					receivePicture(msg);
+					break;
+				case WeimiUtil.UPLOAD_PIC_PRO:
+					uploadPicPro(msg);
+					break;
+				case WeimiUtil.DOWNLOAD_PIC_PRO:
+					downloadPicPro(msg);
+					break;
 			}
 
 		}
@@ -119,27 +81,17 @@ public class WeimiWechatPlugin extends CordovaPlugin {
 		context = this.cordova.getActivity().getApplicationContext();
 		activity = this.cordova.getActivity();
 		if(weimiMsgHandler == null){
-			weimiMsgHandler = new WeimiMsgHandler(context);
+			if(handler == null)
+				handler = new YouyunHandler(WeimiWechatPlugin.this);
+			weimiMsgHandler = new WeimiMsgHandler(context, handler);
 			Thread msgHandler = new Thread(weimiMsgHandler);
 			msgHandler.start();
-		}
-		if(receiver == null){
-			IntentFilter filter = new IntentFilter();
-			filter.addAction("receivetext");
-			filter.addAction("receivepicture");
-			filter.addAction("uploadpicpro");
-			filter.addAction("downloadpicpro");
-			receiver = new MyInnerReceiver();
-			context.registerReceiver(receiver, filter);
 		}
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if(receiver != null){
-			context.unregisterReceiver(receiver);
-		}
 	}
 
 	@Override
@@ -270,6 +222,96 @@ public class WeimiWechatPlugin extends CordovaPlugin {
 		}
 
 		return false;
+	}
+
+	/**
+	 * 下载图片进度条
+	 * @param msg
+     */
+	private void downloadPicPro(Message msg){
+		Bundle bundle = msg.getData();
+		String fileId = bundle.getString("fileID");
+		int progress = bundle.getInt("progress");
+		JSONObject object = new JSONObject();
+		try {
+			object.put("msgType", "downloadProgress");
+			object.put("fileID", fileId);
+			object.put("progress", progress);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		WeimiUtil.log("download:" + object.toString());
+		webView.loadUrl("javascript:receiveMessageThread('" + object.toString() + "')");
+	}
+
+	/**
+	 * 上传图片进度条
+	 * @param msg
+     */
+	private void uploadPicPro(Message msg){
+		Bundle bundle = msg.getData();
+		String fileId = bundle.getString("fileID");
+		int progress = bundle.getInt("progress");
+		JSONObject object = new JSONObject();
+		try {
+			object.put("msgType", "uploadProgress");
+			object.put("fileID", fileId);
+			object.put("progress", progress);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		WeimiUtil.log("upload:" + object.toString());
+		webView.loadUrl("javascript:receiveMessageThread('" + object.toString() + "')");
+	}
+
+	/**
+	 * 接收图片
+	 * @param msg
+	 */
+	private void receivePicture(Message msg){
+		Bundle bundle = msg.getData();
+		String fromuid = bundle.getString("fromuid");
+		long time = bundle.getLong("time", 0);
+		String fileId = bundle.getString("fileId");
+		int fileLength = bundle.getInt("fileLength");
+		int pieceSize = bundle.getInt("pieceSize");
+		String thumbData = bundle.getString("thumbData");
+		JSONObject object = new JSONObject();
+		try {
+			object.put("msgType", "receiveImage");
+			object.put("fromuid",fromuid);
+			object.put("time",time);
+			object.put("fileId",fileId);
+			object.put("fileLength",fileLength);
+			object.put("pieceSize",pieceSize);
+			object.put("thumbData", thumbData);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		WeimiUtil.log("receivepicture：" + object.toString());
+		webView.loadUrl("javascript:receiveMessageThread('"+object.toString()+"')");
+	}
+
+	/**
+	 * 接收文本
+	 * @param msg
+     */
+	private void receiveText(Message msg){
+		Bundle bundle = msg.getData();
+		String fromuid = bundle.getString("fromuid");
+		String content = bundle.getString("content");
+		long time = bundle.getLong("time");
+		JSONObject object = new JSONObject();
+		try {
+			object.put("msgType", "receiveText");
+			object.put("fromuid", fromuid);
+			object.put("content", content);
+			object.put("time", time);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		WeimiUtil.log("receivetext：" + object.toString());
+		webView.loadUrl("javascript:receiveMessageThread('"+object.toString()+"')");
 	}
 
 	/**
@@ -760,7 +802,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
 
 					JSONObject object = new JSONObject();
 
-					boolean isHaveMetaData = false;
+					/*boolean isHaveMetaData = false;
 					ApplicationInfo activityInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
 					if(activityInfo != null){
 						Bundle bundle = activityInfo.metaData;
@@ -779,7 +821,10 @@ public class WeimiWechatPlugin extends CordovaPlugin {
 						WeimiUtil.log(object.toString());
 						callbackContext.success(object.toString());
 						return;
-					}
+					}*/
+
+					clientId = "1-10001-e879c692ba5e9bca45a1fe864e946134-android";
+					secret = "28192ae641a58d1ede7624eea565f497";
 
 					AuthResultData authResultData = WeimiInstance.getInstance().testRegisterApp(
 							context, udid, clientId, secret, 30);
@@ -805,10 +850,10 @@ public class WeimiWechatPlugin extends CordovaPlugin {
 				} catch (WChatException e) {
 					callbackContext.error(e.getMessage());
 					e.printStackTrace();
-				} catch (PackageManager.NameNotFoundException e) {
+				} /*catch (PackageManager.NameNotFoundException e) {
 					callbackContext.error(e.getMessage());
 					e.printStackTrace();
-				} catch (JSONException e) {
+				}*/ catch (JSONException e) {
 					callbackContext.error(e.getMessage());
 					e.printStackTrace();
 				}

@@ -1,7 +1,8 @@
 package io.cordova.cordova;
 
 import android.content.Context;
-import android.content.Intent;
+import android.os.Bundle;
+import android.os.Message;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import matrix.sdk.GroupIdConv;
+import matrix.sdk.message.ConvType;
 import matrix.sdk.message.FileMessage;
 import matrix.sdk.message.NoticeType;
 import matrix.sdk.message.NotifyCenter;
@@ -25,17 +27,19 @@ import matrix.sdk.message.WeimiNotice;
 public class WeimiMsgHandler implements Runnable {
 
     private Context context;
+    private WeimiWechatPlugin.YouyunHandler handler;
     public static Map<String, List<Integer>> fileSend = new ConcurrentHashMap<String, List<Integer>>();
     public static Map<String, Integer> fileSendCount = new ConcurrentHashMap<String, Integer>();
 
-    public WeimiMsgHandler(Context context){
+    public WeimiMsgHandler(Context context, WeimiWechatPlugin.YouyunHandler handler){
         this.context = context;
+        this.handler = handler;
     }
 
     @Override
     public void run() {
         WeimiUtil.log("Message Handler start");
-        WeimiNotice weimiNotice = null;
+        WeimiNotice weimiNotice;
         while (true){
             try {
                 weimiNotice = NotifyCenter.clientNotifyChannel.take();
@@ -88,10 +92,10 @@ public class WeimiMsgHandler implements Runnable {
         WeimiUtil.log("文件ID：" + fileId + "--下载进度为：" + completed * 100 + "%");
         if ((int) completed == 1) {
             WeimiUtil.log("文件ID：" + fileId + "--下载完成");
-            notifyBroadCaseReceiver("downloadpicpro", fileId, 1);
+            notifyHandler(WeimiUtil.DOWNLOAD_PIC_PRO, fileId, 1);
             return;
         }
-        notifyBroadCaseReceiver("downloadpicpro",fileId, completed);
+        notifyHandler(WeimiUtil.DOWNLOAD_PIC_PRO, fileId, completed);
     }
 
     /**
@@ -120,16 +124,19 @@ public class WeimiMsgHandler implements Runnable {
         if (null != fileMessage.thumbData) {
             WeimiUtil.log("缩略图存在：" + Arrays.toString(fileMessage.thumbData));
             String thumbData = WeimiUtil.bitmapToBase64(fileMessage.thumbData);
-            Intent intent = new Intent();
-            intent.setAction("receivepicture");
-            intent.putExtra("fromuid", fileMessage.fromuid);
-            intent.putExtra("time", fileMessage.time);
-            intent.putExtra("fileId", fileMessage.fileId);
-            intent.putExtra("fileLength", fileMessage.fileLength);
-            intent.putExtra("pieceSize", fileMessage.pieceSize);
-            intent.putExtra("thumbData", thumbData);
-            intent.setPackage(context.getPackageName());
-            context.sendBroadcast(intent);
+
+            Message message = handler.obtainMessage();
+            message.what = WeimiUtil.RECEIVE_PICTURE;
+            Bundle bundle = new Bundle();
+            bundle.putString("fromuid", fileMessage.fromuid);
+            bundle.putLong("time", fileMessage.time);
+            bundle.putString("fileId", fileMessage.fileId);
+            bundle.putInt("fileLength", fileMessage.fileLength);
+            bundle.putInt("pieceSize", fileMessage.pieceSize);
+            bundle.putString("thumbData", thumbData);
+            message.setData(bundle);
+            handler.handleMessage(message);
+
         }
 
     }
@@ -149,7 +156,7 @@ public class WeimiMsgHandler implements Runnable {
             fileSend.remove(msgId);
             fileSendCount.remove(msgId);
             WeimiUtil.log(msgId + "==文件完成度：100%，发送成功！");
-            notifyBroadCaseReceiver("uploadpicpro", msgId, 1);
+            notifyHandler(WeimiUtil.UPLOAD_PIC_PRO, msgId, 1);
             return;
         }
 
@@ -174,13 +181,13 @@ public class WeimiMsgHandler implements Runnable {
             fileSend.remove(msgId);
             fileSendCount.remove(msgId);
             WeimiUtil.log(msgId + "--文件完成度：100%，发送成功！");
-            notifyBroadCaseReceiver("uploadpicpro",msgId, 1);
+            notifyHandler(WeimiUtil.UPLOAD_PIC_PRO, msgId, 1);
             return;
         } else {
             WeimiUtil.log("还有" + listSize + "片没有收到");
             double completed = (sliceCount - listSize) / sliceCount;
             WeimiUtil.log("完成度：" + completed * 100 + "%");
-            notifyBroadCaseReceiver("uploadpicpro",msgId, completed);
+            notifyHandler(WeimiUtil.UPLOAD_PIC_PRO, msgId, completed);
             for (int sliceMissId : newList) {
                 WeimiUtil.log("实际缺少的分片号：" + sliceMissId);
             }
@@ -188,15 +195,14 @@ public class WeimiMsgHandler implements Runnable {
 
     }
 
-    Intent intent;
-    private void notifyBroadCaseReceiver(String action, String fileId, double completed){
-        if(intent == null)
-            intent = new Intent();
-        intent.setAction(action);
-        intent.putExtra("fileID", fileId);
-        intent.putExtra("progress", (int) (completed * 100));
-        intent.setPackage(context.getPackageName());
-        context.sendBroadcast(intent);
+    private void notifyHandler(int action, String fileId, double completed){
+        Message message = handler.obtainMessage();
+        message.what = action;
+        Bundle bundle = new Bundle();
+        bundle.putString("fileID", fileId);
+        bundle.putInt("progress", (int) (completed * 100));
+        message.setData(bundle);
+        handler.handleMessage(message);
     }
 
     /**
@@ -217,15 +223,22 @@ public class WeimiMsgHandler implements Runnable {
         TextMessage textMessage = (TextMessage) weimiNotice.getObject();
         String msgId = textMessage.msgId;
         WeimiUtil.log("msgId:" + msgId);
+        WeimiUtil.log("convType:" + textMessage.convType);
         WeimiUtil.log("receive text:" + textMessage.text);
-        Intent intent = new Intent();
-        intent.setAction("receivetext");
-        intent.putExtra("msgId", msgId);
-        intent.putExtra("fromuid", textMessage.fromuid);
-        intent.putExtra("content", textMessage.text);
-        intent.putExtra("time", textMessage.time);
-        intent.setPackage(context.getPackageName());
-        context.sendBroadcast(intent);
+        Message message = handler.obtainMessage();
+        message.what = WeimiUtil.RECEIVE_TEXT;
+        Bundle bundle = new Bundle();
+        bundle.putString("msgId", msgId);
+        bundle.putString("fromuid", textMessage.fromuid);
+        bundle.putString("content", textMessage.text);
+        bundle.putLong("time", textMessage.time);
+        if(textMessage.convType == ConvType.single){
+            bundle.putInt("", 1);
+        }else{
+            bundle.putInt("", 2);
+        }
+        message.setData(bundle);
+        handler.handleMessage(message);
     }
 
     /**
