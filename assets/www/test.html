@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>PhoneGap</title>
+	<script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+
+	<script type="text/javascript">
+	window.onload=function(){
+  		var btnId1 = document.getElementById('btn1');
+  		btnId1.onclick=function(){
+      		cordova.exec(onMessageSuccess,onMessageError,"TestPlugin","action1",[ "成功", "args2" ]);
+  		}
+  		var btnId2 = document.getElementById('btn2');
+  		btnId2.onclick=function(){
+      		cordova.exec(onMessageSuccess,onMessageError,"TestPlugin","action2",[ "args1", "失败" ]);
+  		}
+  		
+  		var loginId = document.getElementById('login');
+  		loginId.onclick=function(){
+      		cordova.exec(onMessageSuccess,onMessageError,"WeimiWechatPlugin","login",[]);
+  		}
+
+      var sendTextId = document.getElementById('sendText');
+      sendTextId.onclick=function(){
+        var text = document.getElementById('text').value;
+        cordova.exec(onMessageSuccess,onMessageError,"WeimiWechatPlugin","sendText",["140109", text]);
+      }
+  		
+	}
+	
+	function onMessageSuccess(result){
+　　    alert("成功啦：>  "+result);
+　　}
+　　function onMessageError(result){
+　　    alert("失败了:(  "+result);
+　　}
+
+	function javaCallJs(result){
+　　    alert("update:" + result);
+　　}
+
+ 
+</script>
+
+</head>
+<body style="text-align:center">
+<br><br><br>
+<input type="button" value="button1" id="btn1"/>&nbsp&nbsp&nbsp
+<input type="button" value="button2" id="btn2"/>
+</br></br></br>
+<input type="button" value="Login" id="login"/>
+<br><br><br>
+<input type="text" id="text">
+<input type="button" value="Send" id="sendText"/>
+</body>
+</html>

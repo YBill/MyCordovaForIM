@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>PhoneGap</title>
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+
+    <script type="text/javascript">
+  window.onload=function(){
+      var creategroup = document.getElementById('creategroup');
+      creategroup.onclick=function(){
+          cordova.exec(onMessageSuccess,onMessageError,"WeimiWechatPlugin","groupCreate",[]);
+      }
+      var inviteadd = document.getElementById('inviteadd');
+      inviteadd.onclick=function(){
+         var groupID = document.getElementById('addgroupgid').value;
+         var userID = document.getElementById('addgroupuid').value;
+         var userID2 = document.getElementById('addgroupuid2').value;
+         var userjsonarray;
+         if("" == userID2){
+            userjsonarray = [userID];
+         }else{
+            userjsonarray = [userID, userID2];
+         }
+         var json = {"groupID" : groupID, "userIDs" : userjsonarray};
+         cordova.exec(onMessageSuccess,onMessageError,"WeimiWechatPlugin","groupAddUser",[json]);
+      }
+      
+      var disbandgroup = document.getElementById('disbandgroup');
+      disbandgroup.onclick=function(){
+          var groupID = document.getElementById('disbandgroupgid').value;
+          var userID = document.getElementById('disbandgroupuid').value;
+          var userjsonarray = [userID];
+          var json = {"groupID" : groupID, "userIDs" : userjsonarray};
+          cordova.exec(onMessageSuccess,onMessageError,"WeimiWechatPlugin","groupDeleteUser",[json]);
+      }
+
+      var sendTextId = document.getElementById('sendText');
+      sendTextId.onclick=function(){
+         var gid = document.getElementById('groupid').value;
+         var text = document.getElementById('text').value;
+         var json = {"groupID" : gid, "content" : text};
+         cordova.exec(onMessageSuccess,onMessageError,"WeimiWechatPlugin","sendGroupText",[json]);
+      }
+      
+      var getgroupuserlistId = document.getElementById('getgroupuserlist');
+      getgroupuserlistId.onclick=function(){
+        var groupid = document.getElementById('getgroupuserlistgid').value;
+        var json = {"groupID" : groupid};
+        cordova.exec(onMessageSuccess,onMessageError,"WeimiWechatPlugin","groupGetTotalUsers",[json]);
+      }
+      var usergrouplistId = document.getElementById('usergrouplist');
+      usergrouplistId.onclick=function(){
+        var uid = document.getElementById('usergrouplistuid').value;
+        var json = {"userID" : uid};
+        cordova.exec(onMessageSuccess,onMessageError,"WeimiWechatPlugin","groupGetUserGroups",[json]);
+      }
+      var exitgroupId = document.getElementById('exitgroup');
+      exitgroupId.onclick=function(){
+        var gid = document.getElementById('exitgroupgid').value;
+        var json = {"groupID" : gid};
+        cordova.exec(onMessageSuccess,onMessageError,"WeimiWechatPlugin","groupExit",[json]);
+      }
+      
+  }
+  
+    function onMessageSuccess(result){
+　　    alert("成功啦：>  "+result);
+　　}
+　　function onMessageError(result){
+　　    alert("失败了:(  "+result);
+　　}
+
+   function javaCallJs(result){
+      var obj = JSON.parse(result);
+      var receiveId = document.getElementById('receiveId');
+      var receiveText = document.getElementById('receiveText');
+      var receiveTime = document.getElementById('receiveTime');
+      receiveId.innerText = obj.fromuid;
+      receiveText.innerText = obj.content;
+      receiveTime.innerText = obj.time;
+　　}
+
+ 
+</script>
+
+</head>
+<body style="text-align:center">
+<input type="button" value="Create Group" id="creategroup"/>&nbsp&nbsp&nbsp
+</br><br>
+<input type="text" id="addgroupgid" placeholder="Please input GroupId">
+<input type="text" id="addgroupuid" placeholder="Please input UserId">
+<input type="text" id="addgroupuid2" placeholder="Please input UserId">
+</br>
+<input type="button" value="Invite Add Group" id="inviteadd"/>
+</br></br>
+<input type="text" id="disbandgroupgid" placeholder="Please input GroupId">
+<input type="text" id="disbandgroupuid" placeholder="Please input UserId">
+<br>
+<input type="button" value="Disband Group" id="disbandgroup"/>&nbsp&nbsp&nbsp
+</br></br>
+<input type="text" id="getgroupuserlistgid" placeholder="Please input GroupId">&nbsp&nbsp&nbsp
+<input type="button" value="获取群成员" id="getgroupuserlist"/>
+<br><br>
+<input type="text" id="usergrouplistuid" placeholder="Please input UserId">&nbsp&nbsp&nbsp
+<input type="button" value="获取用户群列表" id="usergrouplist"/>&nbsp&nbsp&nbsp
+<br><br>
+<input type="text" id="exitgroupgid" placeholder="Please input GroupId">&nbsp&nbsp&nbsp
+<input type="button" value="退群" id="exitgroup"/>&nbsp&nbsp&nbsp
+
+<br><br><br>
+<input type="text" id="groupid" placeholder="Please input GroupId">
+<input type="text" id="text" placeholder="Please input Text">
+<input type="button" value="Send" id="sendText"/>
+<br><br><br>
+<span>发送人：</span>
+<span id="receiveId"></span>
+<br>
+<span>内容：</span>
+<span id="receiveText"></span>
+<br>
+<span>时间：</span>
+<span id="receiveTime"></span>
+
+</body>
+</html>

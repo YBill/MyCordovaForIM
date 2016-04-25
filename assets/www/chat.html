@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>PhoneGap</title>
+	<script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+
+	<script type="text/javascript">
+	window.onload=function(){
+       var sendTextId = document.getElementById('sendText');
+       sendTextId.onclick=function(){
+       	 var uid = document.getElementById('uid').value;
+         var text = document.getElementById('text').value;
+         var json = {"userID" : uid, "content" : text};
+         cordova.exec(onMessageSuccess,onMessageError,"WeimiWechatPlugin","sendText",[json]);
+      }
+
+      var sendImageId = document.getElementById('sendImage');
+       sendImageId.onclick=function(){
+       	 var uid = document.getElementById('uid').value;
+       	 var imageurl = "file:///sdcard/aaa.png";
+         var json = {"userID" : uid, "imageurl" : imageurl};
+         cordova.exec(setImageSuccess,onMessageError,"WeimiWechatPlugin","sendImage",[json]);
+      }
+
+      var showBigImgId = document.getElementById('showBigImg');
+         showBigImgId.onclick=function(){
+         cordova.exec(setImageSuccess,onMessageError,"WeimiWechatPlugin","getFile",[]);
+      }
+	}
+
+	function setImageSuccess(result){
+　　    var smallImage = document.getElementById('thumbnailImg');
+		smallImage.style.display = 'block';
+		smallImage.src = "data:image/jpeg;base64," + result;
+　　}
+	
+	function onMessageSuccess(result){
+　　    alert("发送消息成功：>  "+result);
+　　}
+　　function onMessageError(result){
+　　    alert("发送失败:(  "+result);
+　　}
+
+	function javaCallJs(result){
+		var obj = JSON.parse(result);
+		var receiveId = document.getElementById('receiveId');
+		var receiveText = document.getElementById('receiveText');
+		var receiveTime = document.getElementById('receiveTime');
+		receiveId.innerText = obj.fromuid;
+		receiveText.innerText = obj.content;
+		receiveTime.innerText = obj.time;
+　　}
+
+	function receivePic(result){
+	    console.log(result);
+	    var obj = JSON.parse(result);
+	 	var thumbmailData = obj.thumbData;
+	 	var smallImage = document.getElementById('thumbnailImg');
+        smallImage.style.display = 'block';
+        //在使用base64编码的时候需要使用这样的前缀
+        smallImage.src = "data:image/jpeg;base64," + thumbmailData;
+	}
+
+	function receiveMessageThread(result){
+
+	}
+
+</script>
+
+</head>
+<body style="text-align:center">
+<span>uid：</span>&nbsp;
+<input type="text" id="uid">
+<br>
+<span>text：</span>
+<input type="text" id="text">
+<br><br>
+<input type="button" value="Send" id="sendText"/>
+<br><br><br>
+<span>发送人：</span>
+<span id="receiveId"></span>
+<br>
+<span>内容：</span>
+<span id="receiveText"></span>
+<br>
+<span>时间：</span>
+<span id="receiveTime"></span>
+
+<br><br>
+<input type="button" value="Send Image" id="sendImage"/>
+<input type="button" value="Show Big Image" id="showBigImg"/>
+<br><br>
+<img src="" id="thumbnailImg" width="150px" height="150px">
+</body>
+</html>
