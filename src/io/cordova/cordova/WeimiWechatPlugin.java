@@ -114,7 +114,6 @@ public class WeimiWechatPlugin extends CordovaPlugin {
 	@Override
 	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
 		super.initialize(cordova, webView);
-		System.out.println("initialize");
 		WeimiUtil.log("WeimiWechatPlugin initialize");
 		this.webView = webView;
 		context = this.cordova.getActivity().getApplicationContext();
@@ -751,48 +750,42 @@ public class WeimiWechatPlugin extends CordovaPlugin {
 	 */
 	private void login(final CallbackContext callbackContext) {
 		new Thread(new Runnable() {
-			boolean loginResult = false;
 
 			@Override
 			public void run() {
 				try {
-					String clientIdDefault;
-					String clientSecretDefault;
-					AuthResultData authResultData = null;
+					String clientId = "";
+					String secret = "";
 					String udid = WeimiUtil.generateOpenUDID(context);
 
+					JSONObject object = new JSONObject();
+
+					boolean isHaveMetaData = false;
 					ApplicationInfo activityInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
-					if(activityInfo == null)
-						return;
-					Bundle bundle = activityInfo.metaData;
-					if(bundle == null)
-						return;
-					String clientId = bundle.getString("CLIENT_ID");
-					String secret = bundle.getString("SECRET");
-					WeimiUtil.log("clientId:" + clientId);
-					WeimiUtil.log("secret:" + secret);
-					if(null == clientId || "".equals(clientId) || null == secret || "".equals(secret)){
+					if(activityInfo != null){
+						Bundle bundle = activityInfo.metaData;
+						if(bundle != null){
+							clientId = bundle.getString("CLIENT_ID");
+							secret = bundle.getString("SECRET");
+							WeimiUtil.log("clientId:" + clientId + "|secret:" + secret);
+							if(null != clientId && !"".equals(clientId) && null != secret && !"".equals(secret)){
+								isHaveMetaData = true;
+							}
+						}
+					}
+					if(!isHaveMetaData){
+						object.put("status", 0);
+						object.put("msg", "No clientId or secret in plugin.xml");
+						WeimiUtil.log(object.toString());
+						callbackContext.success(object.toString());
 						return;
 					}
-//					clientIdDefault = "1-10001-e879c692ba5e9bca45a1fe864e946134-android";
-//					clientSecretDefault = "28192ae641a58d1ede7624eea565f497";
-					authResultData = WeimiInstance.getInstance().testRegisterApp(
+
+					AuthResultData authResultData = WeimiInstance.getInstance().testRegisterApp(
 							context, udid, clientId, secret, 30);
 
 					if (authResultData.success) {
-						loginResult = true;
-					}
-
-				} catch (WChatException e) {
-					e.printStackTrace();
-				} catch (PackageManager.NameNotFoundException e) {
-					e.printStackTrace();
-				}
-
-				WeimiUtil.uid = WeimiInstance.getInstance().getUID();
-				JSONObject object = new JSONObject();
-				try {
-					if (loginResult) {
+						WeimiUtil.uid = WeimiInstance.getInstance().getUID();
 						if(null != WeimiUtil.uid && !"".equals(WeimiUtil.uid)){
 							object.put("status", 1);
 							JSONObject obj = new JSONObject();
@@ -803,12 +796,18 @@ public class WeimiWechatPlugin extends CordovaPlugin {
 							object.put("status", 0);
 							object.put("msg", "No userID");
 						}
-					} else {
+					}else {
 						object.put("status", 0);
 						object.put("msg", "");
 					}
 					WeimiUtil.log(object.toString());
 					callbackContext.success(object.toString());
+				} catch (WChatException e) {
+					callbackContext.error(e.getMessage());
+					e.printStackTrace();
+				} catch (PackageManager.NameNotFoundException e) {
+					callbackContext.error(e.getMessage());
+					e.printStackTrace();
 				} catch (JSONException e) {
 					callbackContext.error(e.getMessage());
 					e.printStackTrace();

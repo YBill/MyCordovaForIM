@@ -18,7 +18,7 @@ import java.util.UUID;
 public class WeimiUtil {
 
     public static String uid = "";
-    private static boolean isDebug = false;
+    private static boolean isDebug = true;
 
     /**
      * 根据设备生成一个唯一标识

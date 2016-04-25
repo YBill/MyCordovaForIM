@@ -14,7 +14,13 @@
 	}
 
 	function onLoginSuccess(result){
-　　    window.location.href='file:///android_asset/www/chat.html';
+	    var obj = JSON.parse(result);
+	    if(obj.status == 1){
+	    	window.location.href='file:///android_asset/www/chat.html';
+	    }else{
+	    	alert(obj.msg);
+	    }
+　　
 　　}
 　　function onLoginError(result){
 　　    alert("登录失败");
