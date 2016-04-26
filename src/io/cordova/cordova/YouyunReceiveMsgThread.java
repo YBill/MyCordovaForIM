@@ -41,17 +41,17 @@ public class YouyunReceiveMsgThread implements Runnable {
 
     @Override
     public void run() {
-        WeimiUtil.log("Message Handler start");
+        YouyunUtil.log("Message Handler start");
         WeimiNotice weimiNotice;
         while (true){
             try {
                 weimiNotice = NotifyCenter.clientNotifyChannel.take();
             } catch (InterruptedException e) {
-                WeimiUtil.log("阻塞接受出现异常");
+                YouyunUtil.log("阻塞接受出现异常");
                 break;
             }
             NoticeType type = weimiNotice.getNoticeType();
-            WeimiUtil.log("noticeType" + type);
+            YouyunUtil.log("noticeType" + type);
             switch (type){
                 case exception:
                     exceptionMessageMethod(weimiNotice);
@@ -73,7 +73,7 @@ public class YouyunReceiveMsgThread implements Runnable {
                     break;
             }
 
-            WeimiUtil.log("Message Handler stop");
+            YouyunUtil.log("Message Handler stop");
 
         }
 
@@ -84,21 +84,21 @@ public class YouyunReceiveMsgThread implements Runnable {
      * @param weimiNotice
      */
     private void downloadMethod(WeimiNotice weimiNotice){
-        WeimiUtil.log("********** 接收到文件下载的结果 **********");
+        YouyunUtil.log("********** 接收到文件下载的结果 **********");
         FileMessage fileMessage = (FileMessage) weimiNotice.getObject();
         String fileId = weimiNotice.getWithtag();
         List<Integer> list = fileMessage.hasReveive;
         for (int sliceMissId : list) {
-            WeimiUtil.log("实际已经下载的分片号：" + sliceMissId);
+            YouyunUtil.log("实际已经下载的分片号：" + sliceMissId);
         }
         double completed = (fileMessage.hasReveive.size() / (double) fileMessage.limit);
-        WeimiUtil.log("文件ID：" + fileId + "--下载进度为：" + completed * 100 + "%");
+        YouyunUtil.log("文件ID：" + fileId + "--下载进度为：" + completed * 100 + "%");
         if ((int) completed == 1) {
-            WeimiUtil.log("文件ID：" + fileId + "--下载完成");
-            notifyHandler(WeimiUtil.DOWNLOAD_PIC_PRO, fileId, 1);
+            YouyunUtil.log("文件ID：" + fileId + "--下载完成");
+            notifyHandler(YouyunUtil.DOWNLOAD_PIC_PRO, fileId, 1);
             return;
         }
-        notifyHandler(WeimiUtil.DOWNLOAD_PIC_PRO, fileId, completed);
+        notifyHandler(YouyunUtil.DOWNLOAD_PIC_PRO, fileId, completed);
     }
 
     /**
@@ -109,24 +109,24 @@ public class YouyunReceiveMsgThread implements Runnable {
         FileMessage fileMessage = (FileMessage) weimiNotice.getObject();
         String convId = weimiNotice.getWithtag();
         if (null != convId && convId.startsWith("G")) {
-            WeimiUtil.log("********** 接收到一条群文件消息 **********");
+            YouyunUtil.log("********** 接收到一条群文件消息 **********");
             convId = GroupIdConv.gidTouid(convId);
         } else {
-            WeimiUtil.log("********** 接收到一条单聊文件消息 **********");
+            YouyunUtil.log("********** 接收到一条单聊文件消息 **********");
         }
-        WeimiUtil.log("会话ID：" + convId);
-        WeimiUtil.log("消息ID：" + fileMessage.msgId);
-        WeimiUtil.log("发送者：" + fileMessage.fromuid);
-        WeimiUtil.log("文件类型：" + fileMessage.type);
-        WeimiUtil.log("发送时间：" + fileMessage.time);
-        WeimiUtil.log("文件的ID：" + fileMessage.fileId);
-        WeimiUtil.log("文件的大小：" + fileMessage.fileLength);
-        WeimiUtil.log("分片大小：" + fileMessage.pieceSize);
-        WeimiUtil.log("文件的名称：" + fileMessage.filename);
-        WeimiUtil.log("附加信息：" + fileMessage.padding.toString());
+        YouyunUtil.log("会话ID：" + convId);
+        YouyunUtil.log("消息ID：" + fileMessage.msgId);
+        YouyunUtil.log("发送者：" + fileMessage.fromuid);
+        YouyunUtil.log("文件类型：" + fileMessage.type);
+        YouyunUtil.log("发送时间：" + fileMessage.time);
+        YouyunUtil.log("文件的ID：" + fileMessage.fileId);
+        YouyunUtil.log("文件的大小：" + fileMessage.fileLength);
+        YouyunUtil.log("分片大小：" + fileMessage.pieceSize);
+        YouyunUtil.log("文件的名称：" + fileMessage.filename);
+        YouyunUtil.log("附加信息：" + fileMessage.padding.toString());
         if (null != fileMessage.thumbData) {
-            WeimiUtil.log("缩略图存在：" + Arrays.toString(fileMessage.thumbData));
-            String thumbData = WeimiUtil.bitmapToBase64(fileMessage.thumbData);
+            YouyunUtil.log("缩略图存在：" + Arrays.toString(fileMessage.thumbData));
+            String thumbData = YouyunUtil.bitmapToBase64(fileMessage.thumbData);
 
             JSONObject object = new JSONObject();
             try {
@@ -147,7 +147,7 @@ public class YouyunReceiveMsgThread implements Runnable {
             }
 
             Message message = handler.obtainMessage();
-            message.what = WeimiUtil.RECEIVE_PICTURE;
+            message.what = YouyunUtil.RECEIVE_PICTURE;
             message.obj = object.toString();
             handler.handleMessage(message);
         }
@@ -159,23 +159,23 @@ public class YouyunReceiveMsgThread implements Runnable {
      * @param weimiNotice
      */
     private void sendfileMethod(WeimiNotice weimiNotice){
-        WeimiUtil.log("********** 接收到一条发送文件的返回通知 **********");
+        YouyunUtil.log("********** 接收到一条发送文件的返回通知 **********");
         List<Integer> unUploadSliceList = (List<Integer>) weimiNotice.getObject();
         String msgId = weimiNotice.getWithtag();
         for (Integer i : unUploadSliceList) {
-            WeimiUtil.log("可能缺少的分片号：" + i);
+            YouyunUtil.log("可能缺少的分片号：" + i);
         }
         if (unUploadSliceList.isEmpty()) {
             fileSend.remove(msgId);
             fileSendCount.remove(msgId);
-            WeimiUtil.log(msgId + "==文件完成度：100%，发送成功！");
-            notifyHandler(WeimiUtil.UPLOAD_PIC_PRO, msgId, 1);
+            YouyunUtil.log(msgId + "==文件完成度：100%，发送成功！");
+            notifyHandler(YouyunUtil.UPLOAD_PIC_PRO, msgId, 1);
             return;
         }
 
         // 如果收到缺少分片的回执，但只本地已经清理掉fileSendCount的缓存，可认定是很旧的回执，可以丢掉
         if (!fileSendCount.containsKey(msgId)) {
-            WeimiUtil.log("收到旧的文件上传回执");
+            YouyunUtil.log("收到旧的文件上传回执");
             return;
         }
         List<Integer> list = fileSend.get(msgId);
@@ -193,16 +193,16 @@ public class YouyunReceiveMsgThread implements Runnable {
         if (0 == listSize) {
             fileSend.remove(msgId);
             fileSendCount.remove(msgId);
-            WeimiUtil.log(msgId + "--文件完成度：100%，发送成功！");
-            notifyHandler(WeimiUtil.UPLOAD_PIC_PRO, msgId, 1);
+            YouyunUtil.log(msgId + "--文件完成度：100%，发送成功！");
+            notifyHandler(YouyunUtil.UPLOAD_PIC_PRO, msgId, 1);
             return;
         } else {
-            WeimiUtil.log("还有" + listSize + "片没有收到");
+            YouyunUtil.log("还有" + listSize + "片没有收到");
             double completed = (sliceCount - listSize) / sliceCount;
-            WeimiUtil.log("完成度：" + completed * 100 + "%");
-            notifyHandler(WeimiUtil.UPLOAD_PIC_PRO, msgId, completed);
+            YouyunUtil.log("完成度：" + completed * 100 + "%");
+            notifyHandler(YouyunUtil.UPLOAD_PIC_PRO, msgId, completed);
             for (int sliceMissId : newList) {
-                WeimiUtil.log("实际缺少的分片号：" + sliceMissId);
+                YouyunUtil.log("实际缺少的分片号：" + sliceMissId);
             }
         }
 
@@ -211,9 +211,9 @@ public class YouyunReceiveMsgThread implements Runnable {
     private void notifyHandler(int action, String fileId, double completed){
         JSONObject object = new JSONObject();
         try {
-            if(action == WeimiUtil.UPLOAD_PIC_PRO){
+            if(action == YouyunUtil.UPLOAD_PIC_PRO){
                 object.put("msgType", "uploadProgress");
-            }else if(action == WeimiUtil.DOWNLOAD_PIC_PRO){
+            }else if(action == YouyunUtil.DOWNLOAD_PIC_PRO){
                 object.put("msgType", "downloadProgress");
             }
             object.put("fileID", fileId);
@@ -233,7 +233,7 @@ public class YouyunReceiveMsgThread implements Runnable {
      * @param weimiNotice
      */
     private void sendbackMethod(WeimiNotice weimiNotice){
-        WeimiUtil.log("********** 接收到一条请求的回执 **********");
+        YouyunUtil.log("********** 接收到一条请求的回执 **********");
         SendBackMessage sendBackMessage = (SendBackMessage) weimiNotice.getObject();
         System.out.println(sendBackMessage);
     }
@@ -245,9 +245,9 @@ public class YouyunReceiveMsgThread implements Runnable {
     private void textMessageMethod(WeimiNotice weimiNotice){
         TextMessage textMessage = (TextMessage) weimiNotice.getObject();
         String msgId = textMessage.msgId;
-        WeimiUtil.log("msgId:" + msgId);
-        WeimiUtil.log("convType:" + textMessage.convType);
-        WeimiUtil.log("receive text:" + textMessage.text);
+        YouyunUtil.log("msgId:" + msgId);
+        YouyunUtil.log("convType:" + textMessage.convType);
+        YouyunUtil.log("receive text:" + textMessage.text);
 
         JSONObject object = new JSONObject();
         try {
@@ -265,7 +265,7 @@ public class YouyunReceiveMsgThread implements Runnable {
         }
 
         Message message = handler.obtainMessage();
-        message.what = WeimiUtil.RECEIVE_TEXT;
+        message.what = YouyunUtil.RECEIVE_TEXT;
         message.obj = object.toString();
         handler.handleMessage(message);
     }
@@ -276,8 +276,8 @@ public class YouyunReceiveMsgThread implements Runnable {
      */
     private void exceptionMessageMethod(WeimiNotice weimiNotice){
         WChatException wChatException = (WChatException) weimiNotice.getObject();
-        WeimiUtil.log("新异常:" + wChatException);
-        WeimiUtil.log("cause:" + wChatException.getCause());
+        YouyunUtil.log("新异常:" + wChatException);
+        YouyunUtil.log("cause:" + wChatException.getCause());
     }
 
 }

@@ -15,7 +15,7 @@ import java.util.UUID;
  * Created by 卫彪 on 2016/4/12.
  * 静态类
  */
-public class WeimiUtil {
+public class YouyunUtil {
 
     public static String uid = "";
     private static boolean isDebug = true;

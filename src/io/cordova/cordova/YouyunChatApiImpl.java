@@ -39,7 +39,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                 try {
                     String clientId = "";
                     String secret = "";
-                    String udid = WeimiUtil.generateOpenUDID(context);
+                    String udid = YouyunUtil.generateOpenUDID(context);
 
                     JSONObject object = new JSONObject();
 
@@ -50,7 +50,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                         if (bundle != null) {
                             clientId = bundle.getString("CLIENT_ID");
                             secret = bundle.getString("SECRET");
-                            WeimiUtil.log("clientId:" + clientId + "|secret:" + secret);
+                            YouyunUtil.log("clientId:" + clientId + "|secret:" + secret);
                             if (null != clientId && !"".equals(clientId) && null != secret && !"".equals(secret)) {
                                 isHaveMetaData = true;
                             }
@@ -59,7 +59,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                     if (!isHaveMetaData) {
                         object.put("status", 0);
                         object.put("msg", "No clientId or secret in plugin.xml");
-                        WeimiUtil.log(object.toString());
+                        YouyunUtil.log(object.toString());
                         callback.onSuccess(object.toString());
                         return;
                     }
@@ -68,11 +68,11 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                             context, udid, clientId, secret, 30);
 
                     if (authResultData.success) {
-                        WeimiUtil.uid = WeimiInstance.getInstance().getUID();
-                        if (null != WeimiUtil.uid && !"".equals(WeimiUtil.uid)) {
+                        YouyunUtil.uid = WeimiInstance.getInstance().getUID();
+                        if (null != YouyunUtil.uid && !"".equals(YouyunUtil.uid)) {
                             object.put("status", 1);
                             JSONObject obj = new JSONObject();
-                            obj.put("id", WeimiUtil.uid);
+                            obj.put("id", YouyunUtil.uid);
                             object.put("result", obj);
 //							        webView.loadUrl("file:///android_asset/www/chat.html");
                         } else {
@@ -83,7 +83,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                         object.put("status", 0);
                         object.put("msg", "");
                     }
-                    WeimiUtil.log(object.toString());
+                    YouyunUtil.log(object.toString());
                     callback.onSuccess(object.toString());
                 } catch (WChatException e) {
                     callback.onError(e.getMessage());
@@ -114,7 +114,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                 object.put("status", 0);
                 object.put("msg", "");
             }
-            WeimiUtil.log(object.toString());
+            YouyunUtil.log(object.toString());
             callback.onSuccess(object.toString());
         } catch (JSONException e) {
             callback.onError(e.getMessage());
@@ -124,11 +124,11 @@ public class YouyunChatApiImpl implements YouyunChatApi {
 
     @Override
     public void sendText(String touchId, String text, ConvType convType, ChatApiCallback callback) {
-        WeimiUtil.log("touchId:" + touchId + "|text:" + text + "convType:" + convType);
+        YouyunUtil.log("touchId:" + touchId + "|text:" + text + "convType:" + convType);
         if (null == callback || touchId == null || "".equals(touchId) || text == null || "".equals(text)) {
             return;
         }
-        String msgId = WeimiUtil.genLocalMsgId();
+        String msgId = YouyunUtil.genLocalMsgId();
         try {
             boolean result = WeimiInstance.getInstance().sendText(msgId, touchId, text, convType, null, 120);
             JSONObject object = new JSONObject();
@@ -139,7 +139,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                 object.put("status", 0);
                 object.put("msg", "Call Interface Failure");
             }
-            WeimiUtil.log(object.toString());
+            YouyunUtil.log(object.toString());
             callback.onSuccess(object.toString());
         } catch (WChatException e) {
             callback.onError(e.getMessage());
@@ -152,15 +152,15 @@ public class YouyunChatApiImpl implements YouyunChatApi {
 
     @Override
     public void sendImage(String touchId, String filePath, String thumbnailPath, ConvType convType, ChatApiCallback callback) {
-        WeimiUtil.log("touchId:" + touchId + "|filePath:" + filePath + "|thumbnailPath:" + thumbnailPath);
+        YouyunUtil.log("touchId:" + touchId + "|filePath:" + filePath + "|thumbnailPath:" + thumbnailPath);
         if (null == callback || null == touchId || "".equals(touchId) || null == filePath || "".equals(filePath) || null == thumbnailPath || "".equals(thumbnailPath))
             return;
 
-        byte[] thumbnail = WeimiUtil.getByteByPath(thumbnailPath);
+        byte[] thumbnail = YouyunUtil.getByteByPath(thumbnailPath);
         if (thumbnail == null)
             return;
 
-        String msgId = WeimiUtil.genLocalMsgId();
+        String msgId = YouyunUtil.genLocalMsgId();
         int sliceCount = 0;
         try {
             sliceCount = WeimiInstance.getInstance().sendFile(msgId, touchId, filePath, filePath.substring(filePath.lastIndexOf("/") + 1),
@@ -173,7 +173,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                 object.put("status", 1);
                 object.put("msg", "Call Interface success");
             }
-            WeimiUtil.log(object.toString());
+            YouyunUtil.log(object.toString());
             callback.onSuccess(object.toString());
         } catch (WChatException e) {
             callback.onError(e.getMessage());
@@ -193,7 +193,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
 
     @Override
     public void downloadImage(String fileId, String filePath, int fileLength, int pieceSize, ChatApiCallback callback) {
-        WeimiUtil.log("fileId:" + fileId + "|filePath:" + filePath + "|fileLength:" + fileLength + "|pieceSize:" + pieceSize);
+        YouyunUtil.log("fileId:" + fileId + "|filePath:" + filePath + "|fileLength:" + fileLength + "|pieceSize:" + pieceSize);
         if (null == callback || null == fileId || "".equals(fileId) || null == filePath || "".equals(filePath) || fileLength <= 0 || pieceSize <= 0)
             return;
         try {
@@ -206,7 +206,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                 object.put("status", 0);
                 object.put("msg", "Call Interface Failure");
             }
-            WeimiUtil.log(object.toString());
+            YouyunUtil.log(object.toString());
             callback.onSuccess(object.toString());
         } catch (WChatException e) {
             callback.onError(e.getMessage());
@@ -224,7 +224,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
         WeimiInstance.getInstance().shortGroupCreate(new HttpCallback() {
             @Override
             public void onResponse(String s) {
-                WeimiUtil.log("creategroup groupId:" + s);
+                YouyunUtil.log("creategroup groupId:" + s);
                 JSONObject object = new JSONObject();
                 try {
                     if (null != s && !"".equals(s)) {
@@ -232,13 +232,13 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                         JSONObject obj = new JSONObject();
                         obj.put("groupID", s);
                         object.put("result", obj);
-                        WeimiUtil.log(object.toString());
+                        YouyunUtil.log(object.toString());
                         callback.onSuccess(object.toString());
                         return;
                     }
                     object.put("status", 0);
                     object.put("msg", "No group ID");
-                    WeimiUtil.log(object.toString());
+                    YouyunUtil.log(object.toString());
                     callback.onSuccess(object.toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -256,7 +256,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
 
             @Override
             public void onError(Exception e) {
-                WeimiUtil.log("创建群失败:" + e.getMessage());
+                YouyunUtil.log("创建群失败:" + e.getMessage());
                 callback.onError(e.getMessage());
             }
         }, 120);
@@ -264,13 +264,13 @@ public class YouyunChatApiImpl implements YouyunChatApi {
 
     @Override
     public void exitGroup(String groupId, final ChatApiCallback callback) {
-        WeimiUtil.log("groupId:" + groupId);
+        YouyunUtil.log("groupId:" + groupId);
         if (null == callback || null == groupId || "".equals(groupId))
             return;
         WeimiInstance.getInstance().shortExitGroup(Long.parseLong(groupId), new HttpCallback() {
             @Override
             public void onResponse(String s) {
-                WeimiUtil.log("退群成功回调：" + s);
+                YouyunUtil.log("退群成功回调：" + s);
                 try {
                     JSONObject obj = new JSONObject(s);
                     JSONObject object = new JSONObject();
@@ -279,14 +279,14 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                         boolean result = obj.optBoolean("result");
                         if (status == 1 && result) {
                             object.put("status", 1);
-                            WeimiUtil.log(object.toString());
+                            YouyunUtil.log(object.toString());
                             callback.onSuccess(object.toString());
                             return;
                         }
                     }
                     object.put("status", 0);
                     object.put("msg", "");
-                    WeimiUtil.log(object.toString());
+                    YouyunUtil.log(object.toString());
                     callback.onSuccess(object.toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -304,7 +304,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
 
             @Override
             public void onError(Exception e) {
-                WeimiUtil.log("退群失败:" + e.getMessage());
+                YouyunUtil.log("退群失败:" + e.getMessage());
                 callback.onError(e.getMessage());
             }
         }, 120);
@@ -312,7 +312,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
 
     @Override
     public void groupAddUser(String groupId, String uids, final ChatApiCallback callback) {
-        WeimiUtil.log("groupId:" + groupId + "uids:" + uids);
+        YouyunUtil.log("groupId:" + groupId + "uids:" + uids);
         if (null == callback || null == groupId || "".equals(groupId) || null == uids || "".equals(uids))
             return;
         StringBuffer buffer = new StringBuffer();
@@ -325,7 +325,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                 if (i < jsonArray.length() - 1)
                     buffer.append(",");
             }
-            WeimiUtil.log("uids:" + buffer.toString());
+            YouyunUtil.log("uids:" + buffer.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -333,7 +333,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
         WeimiInstance.getInstance().shortGroupuserAdd(Long.parseLong(groupId), buffer.toString(), new HttpCallback() {
             @Override
             public void onResponse(String s) {
-                WeimiUtil.log("加群回调成功：" + s);
+                YouyunUtil.log("加群回调成功：" + s);
                 try {
                     JSONObject obj = new JSONObject(s);
                     JSONObject object = new JSONObject();
@@ -343,7 +343,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                         if (status == 1 && result > 0) {
                             if (result > 0) {
                                 object.put("status", 1);
-                                WeimiUtil.log(object.toString());
+                                YouyunUtil.log(object.toString());
                             } else {
                                 object.put("status", 0);
                                 object.put("msg", "It is already a member of this group");
@@ -354,7 +354,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                     }
                     object.put("status", 0);
                     object.put("msg", "");
-                    WeimiUtil.log(object.toString());
+                    YouyunUtil.log(object.toString());
                     callback.onSuccess(object.toString());
 
                 } catch (JSONException e) {
@@ -372,7 +372,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
 
             @Override
             public void onError(Exception e) {
-                WeimiUtil.log("加群失败:" + e.getMessage());
+                YouyunUtil.log("加群失败:" + e.getMessage());
                 callback.onError(e.getMessage());
             }
         }, 120);
@@ -381,10 +381,10 @@ public class YouyunChatApiImpl implements YouyunChatApi {
 
     @Override
     public void groupDeleteUser(String groupId, String uids, final ChatApiCallback callback) {
-        WeimiUtil.log("groupId:" + groupId + "uids:" + uids);
+        YouyunUtil.log("groupId:" + groupId + "uids:" + uids);
         if (null == callback || null == groupId || "".equals(groupId) || null == uids || "".equals(uids))
             return;
-        WeimiUtil.log("uids:" + uids);
+        YouyunUtil.log("uids:" + uids);
         StringBuffer buffer = new StringBuffer();
         try {
             JSONArray jsonArray = new JSONArray(uids);
@@ -401,7 +401,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
         WeimiInstance.getInstance().shortGroupuserDel(Long.parseLong(groupId), buffer.toString(), new HttpCallback() {
             @Override
             public void onResponse(String s) {
-                WeimiUtil.log("删除群成员回调成功:" + s);
+                YouyunUtil.log("删除群成员回调成功:" + s);
                 try {
                     JSONObject obj = new JSONObject(s);
                     JSONObject object = new JSONObject();
@@ -411,7 +411,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                         if (status == 1) {
                             if (result > 0) {
                                 object.put("status", 1);
-                                WeimiUtil.log(object.toString());
+                                YouyunUtil.log(object.toString());
                             } else {
                                 object.put("status", 0);
                                 object.put("msg", "No member of this group");
@@ -422,7 +422,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                     }
                     object.put("status", 0);
                     object.put("msg", "");
-                    WeimiUtil.log(object.toString());
+                    YouyunUtil.log(object.toString());
                     callback.onSuccess(object.toString());
 
                 } catch (JSONException e) {
@@ -440,7 +440,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
 
             @Override
             public void onError(Exception e) {
-                WeimiUtil.log("删除群成员失败:" + e.getMessage());
+                YouyunUtil.log("删除群成员失败:" + e.getMessage());
                 callback.onError(e.getMessage());
             }
         }, 120);
@@ -448,13 +448,13 @@ public class YouyunChatApiImpl implements YouyunChatApi {
 
     @Override
     public void getUserListByGroupId(String groupId, final ChatApiCallback callback) {
-        WeimiUtil.log("groupId:" + groupId);
+        YouyunUtil.log("groupId:" + groupId);
         if (null == callback || null == groupId || "".equals(groupId))
             return;
         WeimiInstance.getInstance().shortGroupuserList(Long.parseLong(groupId), new HttpCallback() {
             @Override
             public void onResponse(String s) {
-                WeimiUtil.log("群成员：" + s);
+                YouyunUtil.log("群成员：" + s);
                 try {
                     JSONArray array = new JSONArray(s);
                     JSONObject object = new JSONObject();
@@ -463,13 +463,13 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                         JSONObject obj = new JSONObject();
                         obj.put("users", array);
                         object.put("result", obj);
-                        WeimiUtil.log(object.toString());
+                        YouyunUtil.log(object.toString());
                         callback.onSuccess(object.toString());
                         return;
                     }
                     object.put("status", 0);
                     object.put("msg", "");
-                    WeimiUtil.log(object.toString());
+                    YouyunUtil.log(object.toString());
                     callback.onSuccess(object.toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -486,7 +486,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
 
             @Override
             public void onError(Exception e) {
-                WeimiUtil.log("获取群成员失败:" + e.getMessage());
+                YouyunUtil.log("获取群成员失败:" + e.getMessage());
                 callback.onError(e.getMessage());
             }
         }, 120);
@@ -494,13 +494,13 @@ public class YouyunChatApiImpl implements YouyunChatApi {
 
     @Override
     public void getGroupListByUserId(String userId, final ChatApiCallback callback) {
-        WeimiUtil.log("userId：" + userId);
+        YouyunUtil.log("userId：" + userId);
         if (null == callback || null == userId || "".equals(userId))
             return;
         WeimiInstance.getInstance().shortGroupList(userId, new HttpCallback() {
             @Override
             public void onResponse(String s) {
-                WeimiUtil.log("群列表：" + s);
+                YouyunUtil.log("群列表：" + s);
                 try {
                     JSONArray array = new JSONArray(s);
                     JSONObject object = new JSONObject();
@@ -509,13 +509,13 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                         JSONObject obj = new JSONObject();
                         obj.put("groups", array);
                         object.put("result", obj);
-                        WeimiUtil.log(object.toString());
+                        YouyunUtil.log(object.toString());
                         callback.onSuccess(object.toString());
                         return;
                     }
                     object.put("status", 0);
                     object.put("msg", "");
-                    WeimiUtil.log(object.toString());
+                    YouyunUtil.log(object.toString());
                     callback.onSuccess(object.toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -532,7 +532,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
 
             @Override
             public void onError(Exception e) {
-                WeimiUtil.log("获取用户群列表失败:" + e.getMessage());
+                YouyunUtil.log("获取用户群列表失败:" + e.getMessage());
                 callback.onError(e.getMessage());
             }
         }, 120);

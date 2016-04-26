@@ -43,22 +43,22 @@ public class WeimiWechatPlugin extends CordovaPlugin {
                 return;
             }
             final int what = msg.what;
-            WeimiUtil.log("handler what:" + what);
+            YouyunUtil.log("handler what:" + what);
 
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     switch (what) {
-                        case WeimiUtil.RECEIVE_TEXT:
+                        case YouyunUtil.RECEIVE_TEXT:
                             receiveText(msg);
                             break;
-                        case WeimiUtil.RECEIVE_PICTURE:
+                        case YouyunUtil.RECEIVE_PICTURE:
                             receivePicture(msg);
                             break;
-                        case WeimiUtil.UPLOAD_PIC_PRO:
+                        case YouyunUtil.UPLOAD_PIC_PRO:
                             uploadPicPro(msg);
                             break;
-                        case WeimiUtil.DOWNLOAD_PIC_PRO:
+                        case YouyunUtil.DOWNLOAD_PIC_PRO:
                             downloadPicPro(msg);
                             break;
                     }
@@ -71,7 +71,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
-        WeimiUtil.log("WeimiWechatPlugin initialize");
+        YouyunUtil.log("WeimiWechatPlugin initialize");
         this.webView = webView;
         context = this.cordova.getActivity().getApplicationContext();
         activity = this.cordova.getActivity();
@@ -221,7 +221,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
      */
     private void downloadPicPro(Message msg) {
         String result = (String) msg.obj;
-        WeimiUtil.log("download:" + result);
+        YouyunUtil.log("download:" + result);
         webView.loadUrl("javascript:receiveMessageThread('" + result + "')");
     }
 
@@ -232,7 +232,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
      */
     private void uploadPicPro(Message msg) {
         String result = (String) msg.obj;
-        WeimiUtil.log("upload:" + result);
+        YouyunUtil.log("upload:" + result);
         webView.loadUrl("javascript:receiveMessageThread('" + result + "')");
     }
 
@@ -243,7 +243,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
      */
     private void receivePicture(Message msg) {
         String result = (String) msg.obj;
-        WeimiUtil.log("receivepicture：" + result);
+        YouyunUtil.log("receivepicture：" + result);
         webView.loadUrl("javascript:receiveMessageThread('" + result + "')");
     }
 
@@ -254,7 +254,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
      */
     private void receiveText(Message msg) {
         String result = (String) msg.obj;
-        WeimiUtil.log("receivetext：" + result);
+        YouyunUtil.log("receivetext：" + result);
         webView.loadUrl("javascript:receiveMessageThread('" + result + "')");
     }
 
