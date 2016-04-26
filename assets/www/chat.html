@@ -42,28 +42,23 @@
 　　    alert("发送失败:(  "+result);
 　　}
 
-	function javaCallJs(result){
-		var obj = JSON.parse(result);
-		var receiveId = document.getElementById('receiveId');
-		var receiveText = document.getElementById('receiveText');
-		var receiveTime = document.getElementById('receiveTime');
-		receiveId.innerText = obj.fromuid;
-		receiveText.innerText = obj.content;
-		receiveTime.innerText = obj.time;
-　　}
-
-	function receivePic(result){
-	    console.log(result);
-	    var obj = JSON.parse(result);
-	 	var thumbmailData = obj.thumbData;
-	 	var smallImage = document.getElementById('thumbnailImg');
-        smallImage.style.display = 'block';
-        //在使用base64编码的时候需要使用这样的前缀
-        smallImage.src = "data:image/jpeg;base64," + thumbmailData;
-	}
-
 	function receiveMessageThread(result){
-
+		var obj = JSON.parse(result);
+		if('receiveText' == obj.msgType){
+			var receiveId = document.getElementById('receiveId');
+			var receiveText = document.getElementById('receiveText');
+			var receiveTime = document.getElementById('receiveTime');
+			receiveId.innerText = obj.fromuid;
+			receiveText.innerText = obj.content;
+			receiveTime.innerText = obj.time;
+		}else if('receiveImage' == obj.msgType){
+			var obj = JSON.parse(result);
+	 		var thumbmailData = obj.thumbData;
+	 		var smallImage = document.getElementById('thumbnailImg');
+        	smallImage.style.display = 'block';
+        	//在使用base64编码的时候需要使用这样的前缀
+       	 	smallImage.src = "data:image/jpeg;base64," + thumbmailData;
+		}
 	}
 
 </script>

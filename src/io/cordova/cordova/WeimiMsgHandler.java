@@ -2,7 +2,11 @@ package io.cordova.cordova;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -27,11 +31,11 @@ import matrix.sdk.message.WeimiNotice;
 public class WeimiMsgHandler implements Runnable {
 
     private Context context;
-    private WeimiWechatPlugin.YouyunHandler handler;
+    private Handler handler;
     public static Map<String, List<Integer>> fileSend = new ConcurrentHashMap<String, List<Integer>>();
     public static Map<String, Integer> fileSendCount = new ConcurrentHashMap<String, Integer>();
 
-    public WeimiMsgHandler(Context context, WeimiWechatPlugin.YouyunHandler handler){
+    public WeimiMsgHandler(Context context, Handler handler){
         this.context = context;
         this.handler = handler;
     }
@@ -125,18 +129,28 @@ public class WeimiMsgHandler implements Runnable {
             WeimiUtil.log("缩略图存在：" + Arrays.toString(fileMessage.thumbData));
             String thumbData = WeimiUtil.bitmapToBase64(fileMessage.thumbData);
 
+            JSONObject object = new JSONObject();
+            try {
+                object.put("msgType", "receiveImage");
+                object.put("fromuid", fileMessage.fromuid);
+                object.put("time", fileMessage.time);
+                object.put("fileId", fileMessage.fileId);
+                object.put("fileLength", fileMessage.fileLength);
+                object.put("pieceSize", fileMessage.pieceSize);
+                object.put("thumbData", thumbData);
+                if(fileMessage.convType == ConvType.group){
+                    object.put("convType", 2);
+                }else{
+                    object.put("convType", 1);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
             Message message = handler.obtainMessage();
             message.what = WeimiUtil.RECEIVE_PICTURE;
-            Bundle bundle = new Bundle();
-            bundle.putString("fromuid", fileMessage.fromuid);
-            bundle.putLong("time", fileMessage.time);
-            bundle.putString("fileId", fileMessage.fileId);
-            bundle.putInt("fileLength", fileMessage.fileLength);
-            bundle.putInt("pieceSize", fileMessage.pieceSize);
-            bundle.putString("thumbData", thumbData);
-            message.setData(bundle);
+            message.obj = object.toString();
             handler.handleMessage(message);
-
         }
 
     }
@@ -196,12 +210,22 @@ public class WeimiMsgHandler implements Runnable {
     }
 
     private void notifyHandler(int action, String fileId, double completed){
+        JSONObject object = new JSONObject();
+        try {
+            if(action == WeimiUtil.UPLOAD_PIC_PRO){
+                object.put("msgType", "uploadProgress");
+            }else if(action == WeimiUtil.DOWNLOAD_PIC_PRO){
+                object.put("msgType", "downloadProgress");
+            }
+            object.put("fileID", fileId);
+            object.put("progress", (int) (completed * 100));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         Message message = handler.obtainMessage();
         message.what = action;
-        Bundle bundle = new Bundle();
-        bundle.putString("fileID", fileId);
-        bundle.putInt("progress", (int) (completed * 100));
-        message.setData(bundle);
+        message.obj = object.toString();
         handler.handleMessage(message);
     }
 
@@ -225,19 +249,25 @@ public class WeimiMsgHandler implements Runnable {
         WeimiUtil.log("msgId:" + msgId);
         WeimiUtil.log("convType:" + textMessage.convType);
         WeimiUtil.log("receive text:" + textMessage.text);
+
+        JSONObject object = new JSONObject();
+        try {
+            object.put("msgType", "receiveText");
+            object.put("fromuid", textMessage.fromuid);
+            object.put("content", textMessage.text);
+            object.put("time", textMessage.time);
+            if(textMessage.convType == ConvType.group){
+                object.put("convType", 2);
+            }else{
+                object.put("convType", 1);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         Message message = handler.obtainMessage();
         message.what = WeimiUtil.RECEIVE_TEXT;
-        Bundle bundle = new Bundle();
-        bundle.putString("msgId", msgId);
-        bundle.putString("fromuid", textMessage.fromuid);
-        bundle.putString("content", textMessage.text);
-        bundle.putLong("time", textMessage.time);
-        if(textMessage.convType == ConvType.single){
-            bundle.putInt("", 1);
-        }else{
-            bundle.putInt("", 2);
-        }
-        message.setData(bundle);
+        message.obj = object.toString();
         handler.handleMessage(message);
     }
 

@@ -18,6 +18,8 @@
         android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:supportsRtl="true">
+        <meta-data android:name="CLIENT_ID" android:value="1-10001-e879c692ba5e9bca45a1fe864e946134-android"/>
+        <meta-data android:name="SECRET" android:value="28192ae641a58d1ede7624eea565f497"/>
         <activity
             android:name="io.cordova.cordova.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
