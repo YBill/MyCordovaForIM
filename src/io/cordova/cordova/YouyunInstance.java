@@ -35,10 +35,10 @@ public class YouyunInstance extends YouyunChatApiImpl {
         initReceiveThread(context, handler);
     }
 
-    private WeimiMsgHandler weimiMsgHandler;
+    private YouyunReceiveMsgThread weimiMsgHandler;
     private void initReceiveThread(Context context, Handler handler){
         if (weimiMsgHandler == null) {
-            weimiMsgHandler = new WeimiMsgHandler(context, handler);
+            weimiMsgHandler = new YouyunReceiveMsgThread(context, handler);
             Thread msgHandler = new Thread(weimiMsgHandler);
             msgHandler.start();
         }

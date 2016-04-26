@@ -1,7 +1,6 @@
 package io.cordova.cordova;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
@@ -28,14 +27,14 @@ import matrix.sdk.message.WeimiNotice;
  * 接收消息
  * Created by 卫彪 on 2016/4/12.
  */
-public class WeimiMsgHandler implements Runnable {
+public class YouyunReceiveMsgThread implements Runnable {
 
     private Context context;
     private Handler handler;
     public static Map<String, List<Integer>> fileSend = new ConcurrentHashMap<String, List<Integer>>();
     public static Map<String, Integer> fileSendCount = new ConcurrentHashMap<String, Integer>();
 
-    public WeimiMsgHandler(Context context, Handler handler){
+    public YouyunReceiveMsgThread(Context context, Handler handler){
         this.context = context;
         this.handler = handler;
     }

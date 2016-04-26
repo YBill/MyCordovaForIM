@@ -187,8 +187,8 @@ public class YouyunChatApiImpl implements YouyunChatApi {
         for (int i = 1; i <= sliceCount; i++) {
             list.add(i);
         }
-        WeimiMsgHandler.fileSend.put(msgId, list);
-        WeimiMsgHandler.fileSendCount.put(msgId, sliceCount);
+        YouyunReceiveMsgThread.fileSend.put(msgId, list);
+        YouyunReceiveMsgThread.fileSendCount.put(msgId, sliceCount);
     }
 
     @Override
