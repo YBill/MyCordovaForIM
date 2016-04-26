@@ -92,4 +92,30 @@ public interface YouyunChatApi {
      */
     void getGroupListByUserId(String userId, ChatApiCallback callback);
 
+    /**
+     * 12、建立push连接
+     * @param isLogEnable 是否打开日志
+     */
+    void buildPushConnect(boolean isLogEnable, ChatApiCallback callback);
+
+    /**
+     * 注册push信息 push建立连接后必须调用
+     * @param startTime 勿扰时段开始时间
+     * @param endTime 勿扰时段结束时间
+     * @param callback
+     */
+    void registerPushInfo(String startTime, String endTime, ChatApiCallback callback);
+
+    /**
+     * 注销Push
+     * @param callback
+     */
+    void logoutPush(ChatApiCallback callback);
+
+    /**
+     * 获取Push信息
+     * @param callback
+     */
+    void getPushInfo(ChatApiCallback callback);
+
 }

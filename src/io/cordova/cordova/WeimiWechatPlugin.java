@@ -209,6 +209,14 @@ public class WeimiWechatPlugin extends CordovaPlugin {
                 }
             }
             return true;
+        }else if("pushConnect".equals(action)){
+            buildPushConnect(callbackContext);
+        }else if("pushRegister".equals(action)){
+            registerPushInfo("", "", callbackContext);
+        }else if("pushUnRegister".equals(action)){
+            logoutPush(callbackContext);
+        }else if("pushGetInfo".equals(action)){
+            getPushInfo(callbackContext);
         }
 
         return false;
@@ -256,6 +264,79 @@ public class WeimiWechatPlugin extends CordovaPlugin {
         String result = (String) msg.obj;
         YouyunUtil.log("receivetext：" + result);
         webView.loadUrl("javascript:receiveMessageThread('" + result + "')");
+    }
+
+    /**
+     * 获取Push信息
+     * @param callbackContext
+     */
+    private void getPushInfo(CallbackContext callbackContext){
+        YouyunInstance.getInstance().getPushInfo(new ChatApiCallback() {
+            @Override
+            public void onSuccess(String result) {
+
+            }
+
+            @Override
+            public void onError(String error) {
+
+            }
+        });
+    }
+
+    /**
+     * 注销Push
+     * @param callbackContext
+     */
+    private void logoutPush(CallbackContext callbackContext){
+        YouyunInstance.getInstance().logoutPush(new ChatApiCallback() {
+            @Override
+            public void onSuccess(String result) {
+
+            }
+
+            @Override
+            public void onError(String error) {
+
+            }
+        });
+    }
+
+    /**
+     * 注册Push
+     * @param startTime
+     * @param endTime
+     * @param callbackContext
+     */
+    private void registerPushInfo(String startTime, String endTime, CallbackContext callbackContext){
+        YouyunInstance.getInstance().registerPushInfo(startTime, endTime, new ChatApiCallback() {
+            @Override
+            public void onSuccess(String result) {
+
+            }
+
+            @Override
+            public void onError(String error) {
+
+            }
+        });
+    }
+
+    /**
+     * 建立push连接
+     */
+    private void buildPushConnect(CallbackContext callbackContext){
+        YouyunInstance.getInstance().buildPushConnect(YouyunUtil.isDebug, new ChatApiCallback() {
+            @Override
+            public void onSuccess(String result) {
+
+            }
+
+            @Override
+            public void onError(String error) {
+
+            }
+        });
     }
 
     /**

@@ -5,6 +5,8 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+import com.weimi.push.WeimiPush;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -538,5 +540,98 @@ public class YouyunChatApiImpl implements YouyunChatApi {
         }, 120);
     }
 
+    @Override
+    public void buildPushConnect(boolean isLogEnable, ChatApiCallback callback) {
+        if (null == callback)
+            return;
+        boolean result = WeimiPush.connect(context, WeimiPush.testPushServerIp, isLogEnable);
+        if (result) {
+            callback.onSuccess("");
+        } else {
+            callback.onError("");
+        }
+    }
+
+    @Override
+    public void registerPushInfo(String startTime, String endTime, ChatApiCallback callback) {
+        YouyunUtil.log("startTime：" + startTime + "|endTime:" + endTime);
+        if (null == callback || null == startTime || "".equals(startTime) || null == endTime || "".equals(endTime))
+            return;
+        WeimiInstance.getInstance().shortPushCreate(startTime, endTime, new HttpCallback() {
+            @Override
+            public void onResponse(String s) {
+                YouyunUtil.log("registerPushInfo:" + s);
+            }
+
+            @Override
+            public void onResponse(byte[] bytes) {
+
+            }
+
+            @Override
+            public void onResponseHistory(List<HistoryMessage> list) {
+
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        }, 120);
+    }
+
+    @Override
+    public void logoutPush(ChatApiCallback callback) {
+        if(null == callback)
+            return;
+        WeimiInstance.getInstance().shortPushCancel(new HttpCallback() {
+            @Override
+            public void onResponse(String s) {
+                YouyunUtil.log("logoutPush:" +  s);
+            }
+
+            @Override
+            public void onResponse(byte[] bytes) {
+
+            }
+
+            @Override
+            public void onResponseHistory(List<HistoryMessage> list) {
+
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        }, 120);
+    }
+
+    @Override
+    public void getPushInfo(ChatApiCallback callback) {
+        if(null == callback)
+            return;
+        WeimiInstance.getInstance().shortPushShowUser(new HttpCallback() {
+            @Override
+            public void onResponse(String s) {
+                YouyunUtil.log("getPushInfo:" +  s);
+            }
+
+            @Override
+            public void onResponse(byte[] bytes) {
+
+            }
+
+            @Override
+            public void onResponseHistory(List<HistoryMessage> list) {
+
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        }, 120);
+    }
 
 }

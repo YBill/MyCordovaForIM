@@ -18,7 +18,7 @@ import java.util.UUID;
 public class YouyunUtil {
 
     public static String uid = "";
-    private static boolean isDebug = true;
+    public static boolean isDebug = true;
     public static final int RECEIVE_TEXT = 1001; // 接收文本
     public static final int RECEIVE_PICTURE = 1002; // 接收图片
     public static final int UPLOAD_PIC_PRO = 1003; // 上传进度条
