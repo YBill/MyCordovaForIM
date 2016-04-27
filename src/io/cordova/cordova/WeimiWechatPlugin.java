@@ -141,6 +141,19 @@ public class WeimiWechatPlugin extends CordovaPlugin {
                 }
             }
             return true;
+        }else if ("getFile".equals(action)) {
+            String arg0 = args.getString(0);
+            if (args != null) {
+                JSONObject object = new JSONObject(arg0);
+                if (object != null) {
+                    String fileId = object.optString("fileID");
+                    String filePath = object.optString("filePath");
+                    int fileLength = object.optInt("length");
+                    int pieceSize = object.optInt("pieceSize");
+                    downloadImg(fileId, filePath, fileLength, pieceSize, callbackContext);
+                }
+            }
+            return true;
         } else if ("groupCreate".equals(action)) {
             createGroup(callbackContext);
             return true;
@@ -196,27 +209,26 @@ public class WeimiWechatPlugin extends CordovaPlugin {
                 }
             }
             return true;
-        } else if ("getFile".equals(action)) {
+        }else if("pushConnect".equals(action)){
+            buildPushConnect(callbackContext);
+            return true;
+        }else if("pushRegister".equals(action)){
             String arg0 = args.getString(0);
             if (args != null) {
                 JSONObject object = new JSONObject(arg0);
                 if (object != null) {
-                    String fileId = object.optString("fileID");
-                    String filePath = object.optString("filePath");
-                    int fileLength = object.optInt("length");
-                    int pieceSize = object.optInt("pieceSize");
-                    downloadImg(fileId, filePath, fileLength, pieceSize, callbackContext);
+                    String startTime = object.optString("startTime");
+                    String endTime = object.optString("endTime");
+                    registerPushInfo(startTime, endTime, callbackContext);
                 }
             }
             return true;
-        }else if("pushConnect".equals(action)){
-            buildPushConnect(callbackContext);
-        }else if("pushRegister".equals(action)){
-            registerPushInfo("", "", callbackContext);
         }else if("pushUnRegister".equals(action)){
             logoutPush(callbackContext);
+            return true;
         }else if("pushGetInfo".equals(action)){
             getPushInfo(callbackContext);
+            return true;
         }
 
         return false;

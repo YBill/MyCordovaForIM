@@ -65,10 +65,8 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                         callback.onSuccess(object.toString());
                         return;
                     }
-
-                    AuthResultData authResultData = WeimiInstance.getInstance().testRegisterApp(
-                            context, udid, clientId, secret, 30);
-
+                    AuthResultData authResultData = WeimiInstance.getInstance().registerApp(
+                            context, udid, clientId, secret, 120);
                     if (authResultData.success) {
                         YouyunUtil.uid = WeimiInstance.getInstance().getUID();
                         if (null != YouyunUtil.uid && !"".equals(YouyunUtil.uid)) {
@@ -158,7 +156,14 @@ public class YouyunChatApiImpl implements YouyunChatApi {
         if (null == callback || null == touchId || "".equals(touchId) || null == filePath || "".equals(filePath) || null == thumbnailPath || "".equals(thumbnailPath))
             return;
 
-        byte[] thumbnail = YouyunUtil.getByteByPath(thumbnailPath);
+        byte[] thumbnail;
+        if("Youyun_SendImg_Test".equals(thumbnailPath)){
+            // 测试发图，暂用
+            thumbnail = YouyunUtil.getByteByBitmap(YouyunUtil.getSmallBitmap(filePath));
+        }else{
+            thumbnail = YouyunUtil.getByteByPath(thumbnailPath);
+        }
+
         if (thumbnail == null)
             return;
 
@@ -544,7 +549,8 @@ public class YouyunChatApiImpl implements YouyunChatApi {
     public void buildPushConnect(boolean isLogEnable, ChatApiCallback callback) {
         if (null == callback)
             return;
-        boolean result = WeimiPush.connect(context, WeimiPush.testPushServerIp, isLogEnable);
+        boolean result = WeimiPush.connect(context, WeimiPush.pushServerIp, isLogEnable);
+        YouyunUtil.log("push connect：" + result);
         if (result) {
             callback.onSuccess("");
         } else {

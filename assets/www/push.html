@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>PhoneGap</title>
+	<script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+
+	<script type="text/javascript">
+	window.onload=function(){
+  		var connectId = document.getElementById('connect');
+  		connectId.onclick=function(){
+      		cordova.exec(onSuccess,onError,"WeimiWechatPlugin","pushConnect",[]);
+  		}
+  		var registerId = document.getElementById('register');
+  		registerId.onclick=function(){
+  			var starttime = document.getElementById('starttime').value;
+  			var endtime = document.getElementById('endtime').value;
+  			var json = {"startTime" : starttime, "endTime" : endtime};
+      		cordova.exec(onSuccess,onError,"WeimiWechatPlugin","pushRegister",[json]);
+  		}
+  		var unregisterId = document.getElementById('unregister');
+  		unregisterId.onclick=function(){
+      		cordova.exec(onSuccess,onError,"WeimiWechatPlugin","pushUnRegister",[]);
+  		}
+  		var getinfoId = document.getElementById('getinfo');
+  		getinfoId.onclick=function(){
+      		cordova.exec(onSuccess,onError,"WeimiWechatPlugin","pushGetInfo",[]);
+  		}
+	}
+
+	function onSuccess(result){
+	    var obj = JSON.parse(result);
+	    if(obj.status == 1){
+	    	window.location.href='file:///android_asset/www/chat.html';
+	    }else{
+	    	alert(obj.msg);
+	    }
+　　
+　　}
+　　function onError(result){
+　　    alert("失败");
+　　}
+	
+</script>
+
+</head>
+<body style="text-align:center">
+<br><br><br>
+<input type="button" value="Push Connect" id="connect"/>
+<br><br><br>
+<input type="text" id="starttime" placeholder="Please input startTime">&nbsp&nbsp&nbsp
+<input type="text" id="endtime" placeholder="Please input endTime">
+<br><br>
+<input type="button" value="Push Register" id="register"/>
+<br><br><br>
+<input type="button" value="Push Logout" id="unregister"/>
+<br><br><br>
+<input type="button" value="Push Info" id="getinfo"/>
+</body>
+</html>

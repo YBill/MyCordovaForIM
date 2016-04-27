@@ -7,12 +7,12 @@
 
     <script type="text/javascript">
   window.onload=function(){
-      var creategroup = document.getElementById('creategroup');
-      creategroup.onclick=function(){
+      var creategroupId = document.getElementById('creategroup');
+      creategroupId.onclick=function(){
           cordova.exec(onMessageSuccess,onMessageError,"WeimiWechatPlugin","groupCreate",[]);
       }
-      var inviteadd = document.getElementById('inviteadd');
-      inviteadd.onclick=function(){
+      var inviteaddId = document.getElementById('inviteadd');
+      inviteaddId.onclick=function(){
          var groupID = document.getElementById('addgroupgid').value;
          var userID = document.getElementById('addgroupuid').value;
          var userID2 = document.getElementById('addgroupuid2').value;
@@ -71,7 +71,7 @@
 　　    alert("失败了:(  "+result);
 　　}
 
-   function javaCallJs(result){
+   function receiveMessageThread(result){
       var obj = JSON.parse(result);
       var receiveId = document.getElementById('receiveId');
       var receiveText = document.getElementById('receiveText');

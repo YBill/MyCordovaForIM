@@ -1,22 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<title>PhoneGap</title>
-	<script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    <meta charset="utf-8">
+    <title>PhoneGap</title>
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
 
-	<script type="text/javascript">
+    <script type="text/javascript">
 	window.onload=function(){
   		var loginId = document.getElementById('login');
   		loginId.onclick=function(){
       		cordova.exec(onLoginSuccess,onLoginError,"WeimiWechatPlugin","login",[]);
+  		}
+  		var logoutId = document.getElementById('logout');
+  		logoutId.onclick=function(){
+      		cordova.exec(onLogoutSuccess,onLogoutError,"WeimiWechatPlugin","logout",[]);
   		}
 	}
 
 	function onLoginSuccess(result){
 	    var obj = JSON.parse(result);
 	    if(obj.status == 1){
-	    	window.location.href='file:///android_asset/www/chat.html';
+	        alert(obj.result.id);
+	    	window.location.href='file:///android_asset/www/temp.html';
 	    }else{
 	    	alert(obj.msg);
 	    }
@@ -25,12 +30,28 @@
 　　function onLoginError(result){
 　　    alert("登录失败");
 　　}
+
+    function onLogoutSuccess(result){
+	    var obj = JSON.parse(result);
+	    if(obj.status == 1){
+	        alert("登出成功");
+	    }else{
+	    	alert(obj.msg);
+	    }
+　　
+　　}
+　　function onLogoutError(result){
+　　    alert("登出失败:" + result);
+　　}
 	
-</script>
+
+    </script>
 
 </head>
 <body style="text-align:center">
 <br><br><br>
 <input type="button" value="Login" id="login"/>
+<br><br><br>
+<input type="button" value="Logout" id="logout"/>
 </body>
 </html>

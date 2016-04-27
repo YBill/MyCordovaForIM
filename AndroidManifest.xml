@@ -18,8 +18,10 @@
         android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:supportsRtl="true">
-        <meta-data android:name="CLIENT_ID" android:value="1-10001-e879c692ba5e9bca45a1fe864e946134-android"/>
-        <meta-data android:name="SECRET" android:value="28192ae641a58d1ede7624eea565f497"/>
+        <!--<meta-data android:name="CLIENT_ID" android:value="1-10001-e879c692ba5e9bca45a1fe864e946134-android"/>
+        <meta-data android:name="SECRET" android:value="28192ae641a58d1ede7624eea565f497"/>-->
+        <meta-data android:name="CLIENT_ID" android:value="1-20082-3e1632fba5606ffd129dd9d08b8df64a-android"/>
+        <meta-data android:name="SECRET" android:value="c5bcda37516e2c8dbd41baa2df74821c"/>
         <activity
             android:name="io.cordova.cordova.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale"
@@ -32,6 +34,30 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name="io.cordova.cordova.PushMsgReceiver"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="me.weimi.push.action.20082" />
+                <!-- me.weimi.push.action.第三方的appId -->
+            </intent-filter>
+        </receiver>
+
+        <service android:name="matrix.sdk.countly.OpenUDID_service" >
+            <intent-filter>
+                <action android:name="org.OpenUDID.GETUDID" />
+            </intent-filter>
+        </service>
+        <service
+            android:name="com.weimi.push.service.WeimiPushService"
+            android:exported="true"
+            android:process=":push" >
+            <intent-filter>
+                <action android:name="me.weimi.PushService.BIND" />
+            </intent-filter>
+        </service>
+
     </application>
     <uses-sdk
         android:minSdkVersion="14"

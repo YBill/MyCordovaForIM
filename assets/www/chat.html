@@ -6,6 +6,11 @@
 	<script type="text/javascript" charset="utf-8" src="cordova.js"></script>
 
 	<script type="text/javascript">
+
+	var __fileId;
+	var __fileLength;
+	var __pieceSize;
+
 	window.onload=function(){
        var sendTextId = document.getElementById('sendText');
        sendTextId.onclick=function(){
@@ -18,13 +23,13 @@
       var sendImageId = document.getElementById('sendImage');
        sendImageId.onclick=function(){
        	 var uid = document.getElementById('uid').value;
-       	 var imageurl = "file:///sdcard/aaa.png";
-         var json = {"userID" : uid, "imageurl" : imageurl};
+         var json = {"userID" : uid, "filePath" : "/sdcard/aaa.png", "nailPath" : "Youyun_SendImg_Test"};
          cordova.exec(setImageSuccess,onMessageError,"WeimiWechatPlugin","sendImage",[json]);
       }
 
       var showBigImgId = document.getElementById('showBigImg');
          showBigImgId.onclick=function(){
+         var json = {"fileID" : __fileId, "length" : __fileLength, "pieceSize" : __pieceSize, "filePath" : "/sdcard/bigimg.png"};
          cordova.exec(setImageSuccess,onMessageError,"WeimiWechatPlugin","getFile",[]);
       }
 	}
@@ -34,7 +39,7 @@
 		smallImage.style.display = 'block';
 		smallImage.src = "data:image/jpeg;base64," + result;
 　　}
-	
+
 	function onMessageSuccess(result){
 　　    alert("发送消息成功：>  "+result);
 　　}
@@ -52,14 +57,23 @@
 			receiveText.innerText = obj.content;
 			receiveTime.innerText = obj.time;
 		}else if('receiveImage' == obj.msgType){
-			var obj = JSON.parse(result);
 	 		var thumbmailData = obj.thumbData;
+	 		__fileId = obj.fileId;
+	 		__fileLength = obj.fileLength;
+	 		__pieceSize = obj.pieceSize;
 	 		var smallImage = document.getElementById('thumbnailImg');
         	smallImage.style.display = 'block';
         	//在使用base64编码的时候需要使用这样的前缀
        	 	smallImage.src = "data:image/jpeg;base64," + thumbmailData;
+		}else if('uploadProgress' == obj.msgType){
+			var uploadpro = document.getElementById('uploadpro');
+			uploadpro.innerText = obj.progress;
+		}else if('downloadProgress' == obj.msgType){
+			var downloadpro = document.getElementById('downloadpro');
+			downloadpro.innerText = obj.progress;
 		}
 	}
+
 
 </script>
 
@@ -83,8 +97,11 @@
 <span id="receiveTime"></span>
 
 <br><br>
+<span id="uploadpro"></span>
 <input type="button" value="Send Image" id="sendImage"/>
-<input type="button" value="Show Big Image" id="showBigImg"/>
+<br><br>
+<span id="downloadpro"></span>
+<input type="button" value="Download Image" id="showBigImg"/>
 <br><br>
 <img src="" id="thumbnailImg" width="150px" height="150px">
 </body>

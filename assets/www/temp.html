@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>PhoneGap</title>
+	<script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+
+	<script type="text/javascript">
+	window.onload=function(){
+  		var chatId = document.getElementById('chat');
+  		chatId.onclick=function(){
+      		window.location.href='file:///android_asset/www/chat.html';
+  		}
+
+  		var groupId = document.getElementById('group');
+  		groupId.onclick=function(){
+      		window.location.href='file:///android_asset/www/group.html';
+  		}
+
+  		var pushId = document.getElementById('push');
+  		pushId.onclick=function(){
+      		window.location.href='file:///android_asset/www/push.html';
+  		}
+	}
+
+</script>
+
+</head>
+<body style="text-align:center">
+<br><br><br>
+<input type="button" value="Chat" id="chat"/>
+<br><br><br>
+<input type="button" value="Group" id="group"/>
+<br><br><br>
+<input type="button" value="Push" id="push"/>
+</body>
+</html>
