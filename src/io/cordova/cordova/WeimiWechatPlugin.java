@@ -27,6 +27,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
     private Activity activity;
     private CordovaWebView webView;
     private YouyunHandler handler;
+    private CallbackContext receiveCallback;
 
     class YouyunHandler extends Handler {
 
@@ -87,7 +88,9 @@ public class WeimiWechatPlugin extends CordovaPlugin {
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        if ("login".equals(action)) {
+        if("receiveListener".equals(action)){
+            this.receiveCallback = callbackContext;
+        }else if ("login".equals(action)) {
             login(callbackContext);
             return true;
         } else if ("logout".equals(action)) {
@@ -282,16 +285,16 @@ public class WeimiWechatPlugin extends CordovaPlugin {
      * 获取Push信息
      * @param callbackContext
      */
-    private void getPushInfo(CallbackContext callbackContext){
+    private void getPushInfo(final CallbackContext callbackContext){
         YouyunInstance.getInstance().getPushInfo(new ChatApiCallback() {
             @Override
             public void onSuccess(String result) {
-
+                callbackContext.success(result);
             }
 
             @Override
             public void onError(String error) {
-
+                callbackContext.error(error);
             }
         });
     }
@@ -300,16 +303,16 @@ public class WeimiWechatPlugin extends CordovaPlugin {
      * 注销Push
      * @param callbackContext
      */
-    private void logoutPush(CallbackContext callbackContext){
+    private void logoutPush(final CallbackContext callbackContext){
         YouyunInstance.getInstance().logoutPush(new ChatApiCallback() {
             @Override
             public void onSuccess(String result) {
-
+                callbackContext.success(result);
             }
 
             @Override
             public void onError(String error) {
-
+                callbackContext.error(error);
             }
         });
     }
@@ -320,16 +323,16 @@ public class WeimiWechatPlugin extends CordovaPlugin {
      * @param endTime
      * @param callbackContext
      */
-    private void registerPushInfo(String startTime, String endTime, CallbackContext callbackContext){
+    private void registerPushInfo(String startTime, String endTime, final CallbackContext callbackContext){
         YouyunInstance.getInstance().registerPushInfo(startTime, endTime, new ChatApiCallback() {
             @Override
             public void onSuccess(String result) {
-
+                callbackContext.success(result);
             }
 
             @Override
             public void onError(String error) {
-
+                callbackContext.error(error);
             }
         });
     }
@@ -337,16 +340,16 @@ public class WeimiWechatPlugin extends CordovaPlugin {
     /**
      * 建立push连接
      */
-    private void buildPushConnect(CallbackContext callbackContext){
+    private void buildPushConnect(final CallbackContext callbackContext){
         YouyunInstance.getInstance().buildPushConnect(YouyunUtil.isDebug, new ChatApiCallback() {
             @Override
             public void onSuccess(String result) {
-
+                callbackContext.success(result);
             }
 
             @Override
             public void onError(String error) {
-
+                callbackContext.error(error);
             }
         });
     }

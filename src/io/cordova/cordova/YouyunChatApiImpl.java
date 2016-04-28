@@ -157,10 +157,10 @@ public class YouyunChatApiImpl implements YouyunChatApi {
             return;
 
         byte[] thumbnail;
-        if("Youyun_SendImg_Test".equals(thumbnailPath)){
+        if ("Youyun_SendImg_Test".equals(thumbnailPath)) {
             // 测试发图，暂用
             thumbnail = YouyunUtil.getByteByBitmap(YouyunUtil.getSmallBitmap(filePath));
-        }else{
+        } else {
             thumbnail = YouyunUtil.getByteByPath(thumbnailPath);
         }
 
@@ -551,15 +551,24 @@ public class YouyunChatApiImpl implements YouyunChatApi {
             return;
         boolean result = WeimiPush.connect(context, WeimiPush.pushServerIp, isLogEnable);
         YouyunUtil.log("push connect：" + result);
-        if (result) {
+        JSONObject object = new JSONObject();
+        try {
+            if (result) {
+                object.put("status", 1);
+            } else {
+                object.put("status", 0);
+                object.put("msg", "");
+            }
+            YouyunUtil.log(object.toString());
             callback.onSuccess("");
-        } else {
-            callback.onError("");
+        } catch (JSONException e) {
+            callback.onError(e.getMessage());
+            e.printStackTrace();
         }
     }
 
     @Override
-    public void registerPushInfo(String startTime, String endTime, ChatApiCallback callback) {
+    public void registerPushInfo(String startTime, String endTime, final ChatApiCallback callback) {
         YouyunUtil.log("startTime：" + startTime + "|endTime:" + endTime);
         if (null == callback || null == startTime || "".equals(startTime) || null == endTime || "".equals(endTime))
             return;
@@ -567,6 +576,24 @@ public class YouyunChatApiImpl implements YouyunChatApi {
             @Override
             public void onResponse(String s) {
                 YouyunUtil.log("registerPushInfo:" + s);
+                JSONObject object = new JSONObject();
+                try {
+                    if (s != null && !s.equals("")) {
+                        JSONObject obj = new JSONObject(s);
+                        String code = obj.optString("code");
+                        if (code != null && code.equals("200")) {
+                            object.put("status", 1);
+                            object.put("msg", "Set success");
+                            callback.onSuccess(object.toString());
+                            return;
+                        }
+                    }
+                    object.put("status", 0);
+                    object.put("msg", "Set faild");
+                    callback.onSuccess(object.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -581,19 +608,37 @@ public class YouyunChatApiImpl implements YouyunChatApi {
 
             @Override
             public void onError(Exception e) {
-
+                callback.onError(e.getMessage());
             }
         }, 120);
     }
 
     @Override
-    public void logoutPush(ChatApiCallback callback) {
-        if(null == callback)
+    public void logoutPush(final ChatApiCallback callback) {
+        if (null == callback)
             return;
         WeimiInstance.getInstance().shortPushCancel(new HttpCallback() {
             @Override
             public void onResponse(String s) {
-                YouyunUtil.log("logoutPush:" +  s);
+                YouyunUtil.log("logoutPush:" + s);
+                JSONObject object = new JSONObject();
+                try {
+                    if (s != null && !s.equals("")) {
+                        JSONObject obj = new JSONObject(s);
+                        String code = obj.optString("code");
+                        if (code != null && code.equals("200")) {
+                            object.put("status", 1);
+                            object.put("msg", "Set success");
+                            callback.onSuccess(object.toString());
+                            return;
+                        }
+                    }
+                    object.put("status", 0);
+                    object.put("msg", "Set faild");
+                    callback.onSuccess(object.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -608,19 +653,43 @@ public class YouyunChatApiImpl implements YouyunChatApi {
 
             @Override
             public void onError(Exception e) {
-
+                callback.onError(e.getMessage());
             }
         }, 120);
     }
 
     @Override
-    public void getPushInfo(ChatApiCallback callback) {
-        if(null == callback)
+    public void getPushInfo(final ChatApiCallback callback) {
+        if (null == callback)
             return;
         WeimiInstance.getInstance().shortPushShowUser(new HttpCallback() {
             @Override
             public void onResponse(String s) {
-                YouyunUtil.log("getPushInfo:" +  s);
+                YouyunUtil.log("getPushInfo:" + s);
+                JSONObject object = new JSONObject();
+                try {
+                    if (s != null && !s.equals("")) {
+                        JSONObject obj = new JSONObject(s);
+                        String code = obj.optString("code");
+                        if (code != null && code.equals("200")) {
+                            JSONObject msgObj = obj.optJSONObject("msg");
+                            String userId = msgObj.optString("user_id");
+                            String statrTime = msgObj.optString("start_time");
+                            String endTime = msgObj.optString("end_time");
+                            object.put("status", 1);
+                            object.put("userId", userId);
+                            object.put("statrTime", statrTime);
+                            object.put(endTime, endTime);
+                            callback.onSuccess(object.toString());
+                            return;
+                        }
+                    }
+                    object.put("status", 0);
+                    object.put("msg", "Get User Info Faild");
+                    callback.onSuccess(object.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -635,7 +704,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
 
             @Override
             public void onError(Exception e) {
-
+                callback.onError(e.getMessage());
             }
         }, 120);
     }
