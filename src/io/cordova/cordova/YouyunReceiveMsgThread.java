@@ -148,7 +148,7 @@ public class YouyunReceiveMsgThread implements Runnable {
 
             Message message = handler.obtainMessage();
             message.what = YouyunUtil.RECEIVE_PICTURE;
-            message.obj = object.toString();
+            message.obj = object;
             handler.handleMessage(message);
         }
 
@@ -224,7 +224,7 @@ public class YouyunReceiveMsgThread implements Runnable {
 
         Message message = handler.obtainMessage();
         message.what = action;
-        message.obj = object.toString();
+        message.obj = object;
         handler.handleMessage(message);
     }
 
@@ -266,7 +266,7 @@ public class YouyunReceiveMsgThread implements Runnable {
 
         Message message = handler.obtainMessage();
         message.what = YouyunUtil.RECEIVE_TEXT;
-        message.obj = object.toString();
+        message.obj = object;
         handler.handleMessage(message);
     }
 

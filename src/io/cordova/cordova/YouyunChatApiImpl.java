@@ -62,7 +62,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                         object.put("status", 0);
                         object.put("msg", "No clientId or secret in plugin.xml");
                         YouyunUtil.log(object.toString());
-                        callback.onSuccess(object.toString());
+                        callback.onSuccess(object);
                         return;
                     }
                     AuthResultData authResultData = WeimiInstance.getInstance().registerApp(
@@ -84,7 +84,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                         object.put("msg", "");
                     }
                     YouyunUtil.log(object.toString());
-                    callback.onSuccess(object.toString());
+                    callback.onSuccess(object);
                 } catch (WChatException e) {
                     callback.onError(e.getMessage());
                     e.printStackTrace();
@@ -115,7 +115,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                 object.put("msg", "");
             }
             YouyunUtil.log(object.toString());
-            callback.onSuccess(object.toString());
+            callback.onSuccess(object);
         } catch (JSONException e) {
             callback.onError(e.getMessage());
             e.printStackTrace();
@@ -140,7 +140,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                 object.put("msg", "Call Interface Failure");
             }
             YouyunUtil.log(object.toString());
-            callback.onSuccess(object.toString());
+            callback.onSuccess(object);
         } catch (WChatException e) {
             callback.onError(e.getMessage());
             e.printStackTrace();
@@ -181,7 +181,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                 object.put("msg", "Call Interface success");
             }
             YouyunUtil.log(object.toString());
-            callback.onSuccess(object.toString());
+            callback.onSuccess(object);
         } catch (WChatException e) {
             callback.onError(e.getMessage());
             e.printStackTrace();
@@ -214,7 +214,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                 object.put("msg", "Call Interface Failure");
             }
             YouyunUtil.log(object.toString());
-            callback.onSuccess(object.toString());
+            callback.onSuccess(object);
         } catch (WChatException e) {
             callback.onError(e.getMessage());
             e.printStackTrace();
@@ -240,13 +240,13 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                         obj.put("groupID", s);
                         object.put("result", obj);
                         YouyunUtil.log(object.toString());
-                        callback.onSuccess(object.toString());
+                        callback.onSuccess(object);
                         return;
                     }
                     object.put("status", 0);
                     object.put("msg", "No group ID");
                     YouyunUtil.log(object.toString());
-                    callback.onSuccess(object.toString());
+                    callback.onSuccess(object);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -287,14 +287,14 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                         if (status == 1 && result) {
                             object.put("status", 1);
                             YouyunUtil.log(object.toString());
-                            callback.onSuccess(object.toString());
+                            callback.onSuccess(object);
                             return;
                         }
                     }
                     object.put("status", 0);
                     object.put("msg", "");
                     YouyunUtil.log(object.toString());
-                    callback.onSuccess(object.toString());
+                    callback.onSuccess(object);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -355,14 +355,14 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                                 object.put("status", 0);
                                 object.put("msg", "It is already a member of this group");
                             }
-                            callback.onSuccess(object.toString());
+                            callback.onSuccess(object);
                             return;
                         }
                     }
                     object.put("status", 0);
                     object.put("msg", "");
                     YouyunUtil.log(object.toString());
-                    callback.onSuccess(object.toString());
+                    callback.onSuccess(object);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -423,14 +423,14 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                                 object.put("status", 0);
                                 object.put("msg", "No member of this group");
                             }
-                            callback.onSuccess(object.toString());
+                            callback.onSuccess(object);
                             return;
                         }
                     }
                     object.put("status", 0);
                     object.put("msg", "");
                     YouyunUtil.log(object.toString());
-                    callback.onSuccess(object.toString());
+                    callback.onSuccess(object);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -471,13 +471,13 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                         obj.put("users", array);
                         object.put("result", obj);
                         YouyunUtil.log(object.toString());
-                        callback.onSuccess(object.toString());
+                        callback.onSuccess(object);
                         return;
                     }
                     object.put("status", 0);
                     object.put("msg", "");
                     YouyunUtil.log(object.toString());
-                    callback.onSuccess(object.toString());
+                    callback.onSuccess(object);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -517,13 +517,13 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                         obj.put("groups", array);
                         object.put("result", obj);
                         YouyunUtil.log(object.toString());
-                        callback.onSuccess(object.toString());
+                        callback.onSuccess(object);
                         return;
                     }
                     object.put("status", 0);
                     object.put("msg", "");
                     YouyunUtil.log(object.toString());
-                    callback.onSuccess(object.toString());
+                    callback.onSuccess(object);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -560,7 +560,7 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                 object.put("msg", "");
             }
             YouyunUtil.log(object.toString());
-            callback.onSuccess("");
+            callback.onSuccess(object);
         } catch (JSONException e) {
             callback.onError(e.getMessage());
             e.printStackTrace();
@@ -584,13 +584,13 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                         if (code != null && code.equals("200")) {
                             object.put("status", 1);
                             object.put("msg", "Set success");
-                            callback.onSuccess(object.toString());
+                            callback.onSuccess(object);
                             return;
                         }
                     }
                     object.put("status", 0);
                     object.put("msg", "Set faild");
-                    callback.onSuccess(object.toString());
+                    callback.onSuccess(object);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -629,13 +629,13 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                         if (code != null && code.equals("200")) {
                             object.put("status", 1);
                             object.put("msg", "Set success");
-                            callback.onSuccess(object.toString());
+                            callback.onSuccess(object);
                             return;
                         }
                     }
                     object.put("status", 0);
                     object.put("msg", "Set faild");
-                    callback.onSuccess(object.toString());
+                    callback.onSuccess(object);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -680,13 +680,13 @@ public class YouyunChatApiImpl implements YouyunChatApi {
                             object.put("userId", userId);
                             object.put("statrTime", statrTime);
                             object.put(endTime, endTime);
-                            callback.onSuccess(object.toString());
+                            callback.onSuccess(object);
                             return;
                         }
                     }
                     object.put("status", 0);
                     object.put("msg", "Get User Info Faild");
-                    callback.onSuccess(object.toString());
+                    callback.onSuccess(object);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

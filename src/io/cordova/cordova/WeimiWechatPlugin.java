@@ -243,8 +243,8 @@ public class WeimiWechatPlugin extends CordovaPlugin {
      * @param msg
      */
     private void downloadPicPro(Message msg) {
-        String result = (String) msg.obj;
-        YouyunUtil.log("download:" + result);
+        JSONObject result = (JSONObject) msg.obj;
+        YouyunUtil.log("download:" + result.toString());
         webView.loadUrl("javascript:receiveMessageThread('" + result + "')");
     }
 
@@ -254,8 +254,8 @@ public class WeimiWechatPlugin extends CordovaPlugin {
      * @param msg
      */
     private void uploadPicPro(Message msg) {
-        String result = (String) msg.obj;
-        YouyunUtil.log("upload:" + result);
+        JSONObject result = (JSONObject) msg.obj;
+        YouyunUtil.log("upload:" + result.toString());
         webView.loadUrl("javascript:receiveMessageThread('" + result + "')");
     }
 
@@ -265,8 +265,8 @@ public class WeimiWechatPlugin extends CordovaPlugin {
      * @param msg
      */
     private void receivePicture(Message msg) {
-        String result = (String) msg.obj;
-        YouyunUtil.log("receivepicture：" + result);
+        JSONObject result = (JSONObject) msg.obj;
+        YouyunUtil.log("receivepicture：" + result.toString());
         webView.loadUrl("javascript:receiveMessageThread('" + result + "')");
     }
 
@@ -276,8 +276,8 @@ public class WeimiWechatPlugin extends CordovaPlugin {
      * @param msg
      */
     private void receiveText(Message msg) {
-        String result = (String) msg.obj;
-        YouyunUtil.log("receivetext：" + result);
+        JSONObject result = (JSONObject) msg.obj;
+        YouyunUtil.log("receivetext：" + result.toString());
         webView.loadUrl("javascript:receiveMessageThread('" + result + "')");
     }
 
@@ -288,7 +288,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
     private void getPushInfo(final CallbackContext callbackContext){
         YouyunInstance.getInstance().getPushInfo(new ChatApiCallback() {
             @Override
-            public void onSuccess(String result) {
+            public void onSuccess(JSONObject result) {
                 callbackContext.success(result);
             }
 
@@ -306,7 +306,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
     private void logoutPush(final CallbackContext callbackContext){
         YouyunInstance.getInstance().logoutPush(new ChatApiCallback() {
             @Override
-            public void onSuccess(String result) {
+            public void onSuccess(JSONObject result) {
                 callbackContext.success(result);
             }
 
@@ -326,7 +326,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
     private void registerPushInfo(String startTime, String endTime, final CallbackContext callbackContext){
         YouyunInstance.getInstance().registerPushInfo(startTime, endTime, new ChatApiCallback() {
             @Override
-            public void onSuccess(String result) {
+            public void onSuccess(JSONObject result) {
                 callbackContext.success(result);
             }
 
@@ -343,7 +343,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
     private void buildPushConnect(final CallbackContext callbackContext){
         YouyunInstance.getInstance().buildPushConnect(YouyunUtil.isDebug, new ChatApiCallback() {
             @Override
-            public void onSuccess(String result) {
+            public void onSuccess(JSONObject result) {
                 callbackContext.success(result);
             }
 
@@ -363,7 +363,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
     private void exitGroup(String groupId, final CallbackContext callbackContext) {
         YouyunInstance.getInstance().exitGroup(groupId, new ChatApiCallback() {
             @Override
-            public void onSuccess(String result) {
+            public void onSuccess(JSONObject result) {
                 callbackContext.success(result);
             }
 
@@ -384,7 +384,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
     private void groupDeleteUser(String groupId, String uids, final CallbackContext callbackContext) {
         YouyunInstance.getInstance().groupDeleteUser(groupId, uids, new ChatApiCallback() {
             @Override
-            public void onSuccess(String result) {
+            public void onSuccess(JSONObject result) {
                 callbackContext.success(result);
             }
 
@@ -405,7 +405,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
     private void groupAddUser(String groupId, String uids, final CallbackContext callbackContext) {
         YouyunInstance.getInstance().groupAddUser(groupId, uids, new ChatApiCallback() {
             @Override
-            public void onSuccess(String result) {
+            public void onSuccess(JSONObject result) {
                 callbackContext.success(result);
             }
 
@@ -424,7 +424,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
     private void getGroupListByUserId(String userId, final CallbackContext callbackContext) {
         YouyunInstance.getInstance().getGroupListByUserId(userId, new ChatApiCallback() {
             @Override
-            public void onSuccess(String result) {
+            public void onSuccess(JSONObject result) {
                 callbackContext.success(result);
             }
 
@@ -444,7 +444,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
     private void getUserListByGroupId(String groupId, final CallbackContext callbackContext) {
         YouyunInstance.getInstance().getUserListByGroupId(groupId, new ChatApiCallback() {
             @Override
-            public void onSuccess(String result) {
+            public void onSuccess(JSONObject result) {
                 callbackContext.success(result);
             }
 
@@ -463,7 +463,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
     private void createGroup(final CallbackContext callbackContext) {
         YouyunInstance.getInstance().createGroup(new ChatApiCallback() {
             @Override
-            public void onSuccess(String result) {
+            public void onSuccess(JSONObject result) {
                 callbackContext.success(result);
             }
 
@@ -486,7 +486,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
     private void downloadImg(String fileId, String filePath, int fileLength, int pieceSize, final CallbackContext callbackContext) {
         YouyunInstance.getInstance().downloadImage(fileId, filePath, fileLength, pieceSize, new ChatApiCallback() {
             @Override
-            public void onSuccess(String result) {
+            public void onSuccess(JSONObject result) {
                 callbackContext.success(result);
             }
 
@@ -509,7 +509,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
     private void sendImage(String touchId, String filePath, String thumbnailPath, ConvType convType, final CallbackContext callbackContext) {
         YouyunInstance.getInstance().sendImage(touchId, filePath, thumbnailPath, convType, new ChatApiCallback() {
             @Override
-            public void onSuccess(String result) {
+            public void onSuccess(JSONObject result) {
                 callbackContext.success(result);
             }
 
@@ -530,7 +530,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
     private void sendText(String touchId, String text, ConvType convType, final CallbackContext callbackContext) {
         YouyunInstance.getInstance().sendText(touchId, text, convType, new ChatApiCallback() {
             @Override
-            public void onSuccess(String result) {
+            public void onSuccess(JSONObject result) {
                 callbackContext.success(result);
             }
 
@@ -550,7 +550,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
     private void logout(final CallbackContext callbackContext) {
         YouyunInstance.getInstance().logout(new ChatApiCallback() {
             @Override
-            public void onSuccess(String result) {
+            public void onSuccess(JSONObject result) {
                 callbackContext.success(result);
             }
 
@@ -567,7 +567,7 @@ public class WeimiWechatPlugin extends CordovaPlugin {
     private void login(final CallbackContext callbackContext) {
         YouyunInstance.getInstance().login(new ChatApiCallback() {
             @Override
-            public void onSuccess(String result) {
+            public void onSuccess(JSONObject result) {
                 callbackContext.success(result);
             }
 

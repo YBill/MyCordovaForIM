@@ -18,12 +18,11 @@
 	}
 
 	function onLoginSuccess(result){
-	    var obj = JSON.parse(result);
-	    if(obj.status == 1){
-	        alert(obj.result.id);
+	    if(result.status == 1){
+	        alert(result.result.id);
 	    	window.location.href='file:///android_asset/www/temp.html';
 	    }else{
-	    	alert(obj.msg);
+	    	alert(result.msg);
 	    }
 　　
 　　}
@@ -32,11 +31,10 @@
 　　}
 
     function onLogoutSuccess(result){
-	    var obj = JSON.parse(result);
-	    if(obj.status == 1){
+	    if(result.status == 1){
 	        alert("登出成功");
 	    }else{
-	    	alert(obj.msg);
+	    	alert(result.msg);
 	    }
 　　
 　　}
